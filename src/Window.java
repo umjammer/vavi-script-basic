@@ -13,6 +13,7 @@ public class Window extends JFrame implements KeyListener{
     int input_start = 0;
     String lastSentence = "";
     int buf_ptr = 0;
+    BasicMachine m;
 
     public Window(){
         setTitle("BASIC");
@@ -32,6 +33,10 @@ public class Window extends JFrame implements KeyListener{
         panel.setBufPtr(buf_ptr);
 
         setVisible(true);
+    }
+
+    public void addMachine(BasicMachine machine){
+        m = machine;
     }
 
     public void inputChar(char c){
@@ -127,6 +132,7 @@ public class Window extends JFrame implements KeyListener{
             readLastString();
             System.out.println("str=" + lastSentence);
             println("");
+            m.execute(lastSentence);
             input_start = buf_ptr;
         }else if(c == 8){
             backSpace();

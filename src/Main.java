@@ -6,7 +6,7 @@ public class Main{
     }
 
     Main(){
-        Window w = new Window();
+        BasicMachine machine = new BasicMachine();
     }
 
 }

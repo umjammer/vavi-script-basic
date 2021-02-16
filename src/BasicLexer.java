@@ -18,7 +18,7 @@ public class BasicLexer {
         }
     }
 
-    public static final int NAME = 0, NUMBER = 1, STRING = 2, OPERATOR = 3, END = -1;
+    public static final int NAME = 0, NUMBER = 1, STRING = 2, OPERATOR = 3, COMMA = 4, END = -1;
 
     private String str;
     private int ptr = 0;
@@ -51,8 +51,10 @@ public class BasicLexer {
                 c == '"'            ? 4 : //riteral mode
                 -1;                       //?????
         
-        buf += String.valueOf(c);
+        if(mode != 4) buf += String.valueOf(c);
         ptr++;
+
+        if(c == ',') return COMMA;
 
         String attached_str = str + " ";
 
@@ -91,7 +93,7 @@ public class BasicLexer {
                         escape = true;
                     }else if(c == '"'){
                         ptr++;
-                        string_val = buf + "\"";
+                        string_val = buf;
                         return STRING;
                     }
                     buf += String.valueOf(c);
