@@ -11,7 +11,7 @@ public class BasicLexer {
             System.out.println("Token = " + String.valueOf(
                 s == BasicLexer.NAME ? b.getStringValue() :
                 s == BasicLexer.STRING ? b.getStringValue() :
-                s == BasicLexer.NUMBER ? b.numberIsReal() ? b.getRealValue() : b.getIntegetValue() : 
+                s == BasicLexer.NUMBER ? b.numberIsReal() ? b.getRealValue() : b.getIntegerValue() : 
                 s == BasicLexer.OPERATOR ? b.getStringValue() :
                 s == BasicLexer.END ? "" : ""
             ));
@@ -113,7 +113,7 @@ public class BasicLexer {
         return string_val;
     }
 
-    public int getIntegetValue(){
+    public int getIntegerValue(){
         return int_val;
     }
 
