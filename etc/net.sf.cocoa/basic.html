@@ -1,0 +1,545 @@
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>COCOA Programming Documentation</title>
+</head>
+
+<body bgcolor="#FFFFF0">
+
+<h1>COCOA Programming Documentation</h1>
+
+<p><font size="2"><em>By Chuck McManis<br>
+Copyright © 1996, 1997 Chuck McManis, All Rights Reserved.</em></font></p>
+
+<p>This document contains some relatively hastily put together
+notes on how to program in my version of BASIC named COCOA. If
+you have already programmed in BASIC then you won't have any
+trouble, if BASIC is new to you then I suggest you review a text
+on BASIC programming before trying to decipher this document!</p>
+
+<h2>Table of Contents</h2>
+
+<ul>
+    <li><a href="#Program Construction">Program Construction</a></li>
+    <li><a href="#Statements">Statements</a><ul>
+            <li><a href="#LET">LET statement</a></li>
+            <li><a href="#DATA">DATA statement</a></li>
+            <li><a href="#READ">READ statement</a></li>
+            <li><a href="#RESTORE">RESTORE statement</a></li>
+            <li><a href="#GOSUB">GOSUB statement</a></li>
+            <li><a href="#RETURN">RETURN statement</a></li>
+            <li><a href="#STOP">STOP statement</a></li>
+            <li><a href="#PRINT">PRINT statement</a></li>
+            <li><a href="#INPUT">INPUT statement</a></li>
+            <li><a href="#FOR">FOR statement</a></li>
+            <li><a href="#NEXT">NEXT statement</a></li>
+            <li><a href="#END">END statement</a></li>
+            <li><a href="#ON">ON statement</a></li>
+            <li><a href="#GOTO">GOTO statement</a></li>
+            <li><a href="#IF">IF statement</a></li>
+            <li><a href="#DIMENSION">DIMENSION statement</a></li>
+            <li><a href="#RANDOMIZE">RANDOMIZE statement</a></li>
+            <li><a href="#TROFF">TROFF statement</a></li>
+            <li><a href="#REM">REM statement</a></li>
+            <li><a href="#TRON">TRON statement</a></li>
+        </ul>
+    </li>
+    <li><a href="#]">Functions</a><ul>
+            <li><a href="#RND">RND function</a></li>
+            <li><a href="#INT">INT function</a></li>
+            <li><a href="#SIN">SIN function</a></li>
+            <li><a href="#COS">COS function</a></li>
+            <li><a href="#TAN">TAN function</a></li>
+            <li><a href="#ATN">ATN function</a></li>
+            <li><a href="#SQR">SQR function</a></li>
+            <li><a href="#MAX">MAX function</a></li>
+            <li><a href="#MIN">MIN function</a></li>
+            <li><a href="#ABS">ABS function</a></li>
+            <li><a href="#LEN">LEN function</a></li>
+            <li><a href="#LOG">LOG function</a></li>
+            <li><a href="#FRE">FRE function</a></li>
+            <li><a href="#SGN">SGN function</a></li>
+            <li><a href="#VAL">VAL function</a></li>
+            <li><a href="#LEFT$">LEFT$ function</a></li>
+            <li><a href="#RIGHT$">RIGHT$ function</a></li>
+            <li><a href="#MID$">MID$ function</a></li>
+            <li><a href="#CHR$">CHR$ function</a></li>
+            <li><a href="#STR$">STR$ function</a></li>
+            <li><a href="#SPC$">SPC$ function</a></li>
+            <li><a href="#TAB$">TAB$ function</a></li>
+        </ul>
+    </li>
+</ul>
+
+<hr>
+
+<h2><a name="Program Construction">Program Construction</a></h2>
+
+<p>A COCOA program is constructed of numbered BASIC statements.
+Line numbers are integral numbers between 0 and 2^63-1. A
+statement has the general form of : </p>
+
+<pre>	<i>[ NUMBER ]</i> <b>KEYWORD</b> <i>Statement Specific information [ : </i><strong>KEYWORD </strong><em>Statement ]</em></pre>
+
+<p>Variables in COCOA are either <i>numeric</i> or <i>string</i>
+variables. String variables are distinguished by a trailing $
+character. Legal numeric variables are A - Z, A0 - A9, ..., Z0 -
+Z9. The set of legal string variables are A$ - Z$. </p>
+
+<p>String <i>constants</i> are expressed in COCOA by any
+characters surrounded by double quote (&quot;) characters. </p>
+
+<pre>	&quot;hello world&quot;,&quot;a&quot;,&quot;123&quot;</pre>
+
+<p>Are all examples of legal string constants.</p>
+
+<p>Numeric <i>constants</i> are expressed as floating point
+numbers. (Internally represented by Java <b>Double</b> class.)
+Numeric constants consist of a whole part, decimal point,
+fractional part, and optional exponent. </p>
+
+<pre>	1, 1.5, .8, .314159E1</pre>
+
+<p>Are all legal numeric constants. </p>
+
+<h2><a name="Statements">Statements</a></h2>
+
+<p>The COCOA BASIC interpreter accepts several statements in the
+construction of programs, statements are preceded by a keyword
+and followed by statement specific information. Statements that
+begin with a line number are stored for later execution,
+statements that do not have a line number are executed
+immediately. The statements that COCOA implement are shown below.
+</p>
+
+<h4>The <a name="LET"><i>LET</i></a> Statement</h4>
+
+<p>The LET statement has the following syntax: </p>
+
+<pre>	[ <b>LET</b> ] <i>Variable</i> <b>=</b> <i>Expression</i></pre>
+
+<p>The actual LET keyword is optional as any statement that
+starts with a variable name will be presumed to be a LET
+statement. The expression can be any legal numeric expression. </p>
+
+<h4>The <a name="DATA"><i>DATA</i></a> Statement</h4>
+
+<p>The DATA statement has the following syntax: </p>
+
+<pre>	<b>DATA</b> [<i>String</i> | <i>Number</i> ], ...</pre>
+
+<p>The DATA statement is used to provide initialized data that
+can be later read by a READ statement. The statement is followed
+by one or more constants separated by commas. The constants may
+be string or numeric constants, however if the read attempts to
+read the wrong type of constant for the variable it is reading,
+then you will get a run time error. </p>
+
+<h4>The <a name="READ"><i>READ</i></a> Statement</h4>
+
+<p>The READ statement has the following syntax: </p>
+
+<pre>	<b>READ</b> <i>Variable</i>[, <i>Variable</i>, ... ]</pre>
+
+<p>The READ statement is used to read data that has been
+initialized with a DATA statement. When the data is read in the
+same order it declared in DATA statements. If an attempt is made
+to read a number into a string variable or a string into a
+numeric variable, a run time error occurs. </p>
+
+<h4>The <a name="RESTORE"><i>RESTORE</i></a> Statement</h4>
+
+<p>The RESTORE statement has the following syntax: </p>
+
+<pre>	<b>RESTORE</b></pre>
+
+<p>The RESTORE statement resets the data read pointer back to the
+first declared data constant. This allows the data to be re-read
+at a later time, or to start from a known position in the data
+stream. </p>
+
+<h4>The <a name="GOSUB"><i>GOSUB</i></a> Statement</h4>
+
+<p>The GOSUB statement has the following syntax: </p>
+
+<pre>	<b>GOSUB</b> <i>LineNumber</i></pre>
+
+<p>The GOSUB statement causes program execution to transfer to
+the <i>Destination</i> line number while remembering where the
+GOSUB occurred. Later when a RETURN statement is encountered (see
+below) execution resumes at the next numbered statement past the
+GOSUB. </p>
+
+<h4>The <a name="RETURN"><i>RETURN</i></a> Statement</h4>
+
+<p>The RETURN statement has the following syntax: </p>
+
+<pre>	<b>RETURN</b></pre>
+
+<p>The RETURN statement will cause execution of the program to
+resume at the <em><strong>numbered</strong></em> statement
+following the last GOSUB. </p>
+
+<h4>The <a name="STOP"><i>STOP</i></a> Statement</h4>
+
+<p>The STOP statement has the syntax: </p>
+
+<pre>	<b>STOP</b></pre>
+
+<p>This statement causes the interpreter to stop execution of the
+current program and return to the command prompt. Execution may
+be resumed with the <i>RESUME</i> command. </p>
+
+<h4>The <a name="PRINT"><i>PRINT</i></a> Statement</h4>
+
+<p>The PRINT statement has the following syntax: </p>
+
+<pre>	<b>PRINT</b> [ <i>String</i> | <i>Expression</i> ] [ <b>,</b> | <b>;</b> ] ...</pre>
+
+<p>The PRINT statement is the only form of output for the COCOA
+interpreter. It takes a list of things to print that may be
+either string constants or numeric expressions (including numeric
+constants). These are separated by separator characters. If the
+separator is ',' then the two items will be separated by an ASCII
+tab character, if they are separated by a semicolon (<b>;</b>)
+they will be separated by no space. </p>
+
+<h4>The <a name="INPUT"><i>INPUT</i></a> Statement</h4>
+
+<p>The syntax of the INPUT statement is :</p>
+
+<pre><strong>	INPUT</strong> [ &quot;prompt&quot;; ] var1, var2, ... varN</pre>
+
+<p>The variables can be string variables or numeric variables but
+they cannot be expressions. When reading into a string variable
+all characters up to the first comma are stored into the string
+variable, unless the string is quoted with &quot; characters.</p>
+
+<p>If insufficient input is provided, the prompt is re-iterated
+for more data. </p>
+
+<p>The INPUT statement is used to read input from the user. The
+INPUT statement reads comma separated items to fill the necessary
+variable arguments. A runtime error is thrown if a numeric
+variable is not given a valid constant. Strings containing quotes
+<i>must</i> be enclosed in quotes, those without commas may
+dispense with quoting. </p>
+
+<h4>The <a name="FOR"><i>FOR</i></a> Statment</h4>
+
+<p>The FOR statement has the following syntax: </p>
+
+<pre>	<b>FOR</b> <i>Variable</i> = <i>Expression1</i> <b>TO</b> <i>Expression2</i> [ <b>STEP</b> <i>Expression3</i> ]</pre>
+
+<p>The FOR statement provides an iterative loop control The
+variable is set initially to the value of the first expression (<i>Expression1</i>).
+Then the statements between this statement and the matching NEXT
+statement are executed. Control returns to the for statement
+which adds the value of the STEP expression to the variable
+(default is 1.0) and if the variable is greater than or equal to
+the second expression, the loop is processed again. </p>
+
+<h4>The <a name="NEXT"><i>NEXT</i></a> Statement</h4>
+
+<p>The NEXT statement has the following syntax: </p>
+
+<pre>	<b>NEXT</b> <i>Variable</i></pre>
+
+<p>The NEXT statement will return execution to the matching FOR
+statement. This match is determined to be the FOR statement with
+the same variable name as the NEXT statement. FOR-NEXT loops may
+be nested but they may not be intertwined, for example the
+following code is legal</p>
+
+<pre>100 FOR i = 1 to 10
+110 FOR j = i to 10
+120 PRINT &quot;*&quot;;
+130 NEXT j
+140 NEXT i</pre>
+
+<p>Note that in the code above the <font face="Times New Roman"><tt>NEXT
+J</tt></font> is nested inside the <font face="Times New Roman"><tt>NEXT
+I </tt></font>statement. In contrast the following code is not
+legal because there is no <font face="Times New Roman"><tt>NEXT J</tt></font>
+statement before the <font face="Times New Roman"><tt>NEXT I </tt></font>statement.</p>
+
+<pre>100 FOR I = 1 to 10
+110 FOR J = 1 to 10
+120 NEXT I
+130 NEXT J</pre>
+
+<h4>The <a name="END"><i>END</i></a> Statement</h4>
+
+<p>The END statement has the following syntax: </p>
+
+<pre>	<b>END</b></pre>
+
+<p>The END statement causes execution to stop and control to be
+returned to the command interpreter. </p>
+
+<h4>The <a name="ON"><i>ON</i></a> Statment</h4>
+
+<p>The syntax of the ON statement is as follows : </p>
+
+<pre>	<b>ON</b> <i>Variable</i> <b>GOTO</b> <i>Line1</i> [ , <i>Line2</i>, ... ] [ : <em>default statement</em> ]
+	<b>ON</b> <i>Variable</i> <b>GOSUB</b> <i>Line1</i> [ , <i>Line2</i>, ... ] [ : <em>default statement </em>]</pre>
+
+<p>The ON command supports the notion of a computed change of
+execution. The integral value of the variable is used to
+determine which statement will be executed next. For values less
+than 0 the next statement is always executed, for values between
+0 and one minus the number of line numbers present, the matching
+line number is used as the target for the GOTO or GOSUB, for
+numbers greater than one minus the number of line numbers the
+next statement is execute. </p>
+
+<p>If the computation value exceeds the number of line numbers
+given, execution passes to either the statement following the
+GOSUB on the same line (separated by a colon (:)) or if that line
+isn't present, the next numbered line.</p>
+
+<h4>The <a name="GOTO"><i>GOTO</i></a> Statment</h4>
+
+<p>The GOTO statement has the following syntax: </p>
+
+<pre>	<b>GOTO</b> <i>LineNumber</i></pre>
+
+<p>The GOTO statement unconditionally transfers execution of the
+program to the specified line number. </p>
+
+<h4>The <a name="IF"><i>IF</i></a> Statement</h4>
+
+<p>The IF statement has the following syntax: </p>
+
+<pre>	<b>IF</b> <i>BooleanExpression</i> <b>THEN</b> <i>Statement</i>
+	<b>IF</b> <i>BooleanExpression</i> <b>THEN</b> <i>LineNumber</i></pre>
+
+<p>The IF statement conditionally transfers control of execution
+based on the boolean value of its controlling expression. In the
+first form, if the expression resolves to a 'true' value control
+is passed to the statement after the THEN keyword. This can be a
+compound statement separated by colons. In the second form
+control is transferred to the line number indicated. This is
+analagous to using </p>
+
+<pre>	<b>IF</b> <i>BooleanExpression</i> <b>THEN GOTO</b> <i>LineNumber</i></pre>
+
+<h4>The <a name="DIMENSION"><em>DIMENSION</em></a> statement.</h4>
+
+<p>The DIMension statement is used to declare arrays in the BASIC
+language. Unlike scalar variables arrays must be declared before
+they are used. Three policy decisions are in force:</p>
+
+<ol>
+    <li>Array and scalars share the same variable name space so
+        DIM A(1,1) and LET A = 20 don't work together.</li>
+    <li>Non-declared arrays have no default declaration. Some
+        BASICs will default an array reference to a 10 element
+        array.</li>
+    <li>Arrays are limited to four dimensions.</li>
+</ol>
+
+<p>Statement syntax is :</p>
+
+<pre>        <strong>DIM</strong> var1(i1, ...), var2(i1, ...), ...</pre>
+
+<h4>The <a name="RANDOMIZE"><em>RANDOMIZE</em></a><em> </em>statement.</h4>
+
+<p>The <em>RANDOMIZE</em> statement seeds the random number
+generator. Syntax is:</p>
+
+<pre>        <strong>RANDOMIZE</strong></pre>
+
+<h4>The <a name="TROFF"><em>TROFF</em></a> statement.</h4>
+
+<p>The <em>TROFF</em> statement turns TRacing OFF. Syntax is:</p>
+
+<pre>       <strong> TROFF</strong></pre>
+
+<h4>The <a name="REM"><em>REM</em></a> Statement</h4>
+
+<p>The REMark statement is used to insert comments into the
+source code. All text after the REM keyword, up to the end of
+line, is ignored by the interpreter. The syntax for the statement
+is:</p>
+
+<pre>        <strong>REM</strong> <em>comment text</em></pre>
+
+<h4>The <a name="TRON"><em>TRON</em></a> statement.</h4>
+
+<p>The <em>TRON</em> statement turns TRacing ON. Syntax is:</p>
+
+<pre>        <strong>TRON</strong> [&quot;file name&quot;]</pre>
+
+<p>If filename is supplied the trace output is directed there.</p>
+
+<h2><a name="]">Functions</a></h2>
+
+<p>COCOA has several built in functions. These are used for
+computing trignometric values as well as generating random values
+and dissecting strings. The complete list as of this writing are
+as follows:</p>
+
+<h4><a name="RND">RND</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = RND(10)</tt></font></p>
+
+<p>This function returns a random number between 0.0 and the
+value passed. If no value is passed it returns a number between 0
+and 1.0.. </p>
+
+<h4><a name="INT">INT</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = INT(10.2*.5)</tt></font></p>
+
+<p>This function returns an integral number nearest to the value
+of the expression passed as its argument. This is equivalent to
+the floor function in Java.</p>
+
+<h4><a name="SIN">SIN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = SIN(3.14159)</tt></font></p>
+
+<p>This function takes an expression in radians and returns the
+sine of that expression. </p>
+
+<h4><a name="COS">COS</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A =
+COS(3.14159*2.0)</tt></font></p>
+
+<p>This function takes an expression in radians and returns the
+cosine of that expression. </p>
+
+<h4><a name="TAN">TAN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = TAN(1.0)</tt></font></p>
+
+<p>This function takes an expression in radians and returns its
+tangent. </p>
+
+<h4><a name="ATN">ATN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = ATN(2)</tt></font></p>
+
+<p>This function takes an expression in radians and returns its
+arctangent. </p>
+
+<h4><a name="SQR">SQR</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = SQR(16)</tt></font></p>
+
+<p>This function takes an expression and returns the square root
+of its value. </p>
+
+<h4><a name="MAX">MAX</a> function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = MAX(10.0, 3.5)</tt></font></p>
+
+<p>This function takes two expressions and returns the one that
+is greater in value.</p>
+
+<h4><a name="MIN">MIN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = MIN(10.0, 3.5)</tt></font></p>
+
+<p>This function takes two expressions and returns the one that
+is lesser in value.</p>
+
+<h4><a name="ABS">ABS</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = ABS(-5)</tt></font></p>
+
+<p>This function takes an expression and returns the absolute
+value of that expression.</p>
+
+<h4><a name="LEN">LEN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = LEN(C$)</tt></font></p>
+
+<p>This function takes a string expression and returns the number
+of characters in the string.</p>
+
+<h4><a name="LOG">LOG</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = LOG(21)</tt></font></p>
+
+<p>This function computes the logarithm of the expression passed
+in as its argument.</p>
+
+<h4><a name="FRE">FRE</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = FRE</tt></font></p>
+
+<p>This function returns the amount of &quot;free&quot; memory
+(its for legacy programs :-) and currently always returns 8192.0.</p>
+
+<h4><a name="SGN">SGN</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = SGN(A * B)</tt></font></p>
+
+<p>This function takes an expression and returns 1.0 if the value
+of the expression is positive or -1.0 if the value of the
+expression is negative.</p>
+
+<h4><a name="VAL">VAL</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A = VAL(C$)</tt></font></p>
+
+<p>This function converts a numeric constant stored in a string
+variable into a numeric value.</p>
+
+<h4><a name="CHR$">CHR$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ =CHR$(20)</tt></font></p>
+
+<p>This function takes an expression and returns a string
+containing the ASCII character represented by that number. </p>
+
+<h4><a name="LEFT$">LEFT$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ = LEFT$(A$, N)</tt></font></p>
+
+<p>This function takes an expression and a string and returns the
+<em>n</em> leftmost characters in the string.</p>
+
+<h4><a name="RIGHT$">RIGHT$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ = RIGHT$(B$, N)</tt></font></p>
+
+<p>This function takes an expression and a string and returns the
+<em>n</em> rightmost characters in the string.</p>
+
+<h4><a name="MID$">MID$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ =MID$(C$, N, M)</tt></font></p>
+
+<p>This function takes a string and two expressions, then returns
+all characters between the <em>n</em>th and the <em>m</em>th
+positions in the string. </p>
+
+<h4><a name="STR$">STR$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ =STR$(A)</tt></font></p>
+
+<p>This function takes an expression and returns a string
+containg the numeric value of that expression. This is the
+inverse of VAL above.</p>
+
+<h4><a name="SPC$">SPC$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ =SPC$(N)</tt></font></p>
+
+<p>This function takes an expression and returns a string
+consisting of <em>n</em> space characters.</p>
+
+<h4><a name="TAB$">TAB$</a> Function</h4>
+
+<p>Usage: <font face="Times New Roman"><tt>LET A$ =TAB$(N)</tt></font></p>
+
+<p>This function trys to compute a string that would position the
+cursor at column <em>n</em> . It doesn't always work as you might
+expect. </p>
+</body>
+</html>

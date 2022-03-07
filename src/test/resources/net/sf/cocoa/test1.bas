@@ -1,0 +1,5 @@
+100 FOR i = 1 to 10
+110 FOR j = i to 10
+120 PRINT "*";
+130 NEXT j
+140 NEXT i
