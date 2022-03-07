@@ -1,7 +1,9 @@
+package com.github.shakeo;
+
 public class Variable{
 
     public static final int TYPE_INT = 1, TYPE_REAL = 2, TYPE_STRING = 3;
-    private String name;
+    public String name;
     private int type = 0;
     private int int_val;
     private double real_val;
@@ -195,5 +197,15 @@ public class Variable{
             return String.valueOf(str_val);
         }
         return null;
+    }
+
+    public Object unparse() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isArray() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

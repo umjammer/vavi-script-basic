@@ -1,3 +1,7 @@
+package com.github.shakeo;
+
+import vavi.util.Debug;
+
 public class BasicLexer {
 
     /**
@@ -7,8 +11,8 @@ public class BasicLexer {
         BasicLexer b = new BasicLexer("PRINT \"AA A\"/140433+B");
         int s;
         while((s = b.getToken()) != BasicLexer.END){
-            System.out.println(s);
-            System.out.println("Token = " + String.valueOf(
+            Debug.println(s);
+            Debug.println("Token = " + String.valueOf(
                 s == BasicLexer.NAME ? b.getStringValue() :
                 s == BasicLexer.STRING ? b.getStringValue() :
                 s == BasicLexer.NUMBER ? b.numberIsReal() ? b.getRealValue() : b.getIntegerValue() : 
@@ -50,7 +54,7 @@ public class BasicLexer {
                 isOperatorSymbol(c) ? 3 : //symbol mode
                 c == '"'            ? 4 : //riteral mode
                 -1;                       //?????
-        
+
         if(mode != 4) buf += String.valueOf(c);
         ptr++;
 

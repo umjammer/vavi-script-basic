@@ -1,4 +1,4 @@
-# 字句解析器BasicLexerの設計
+PRINT# 字句解析器BasicLexerの設計
 
 ## 例
 
