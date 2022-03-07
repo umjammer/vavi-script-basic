@@ -1,3 +1,29 @@
-# BASIC emulator
+# vavi-script-basic
 
-![Screenshot from 2021-02-13 12-41-09](https://user-images.githubusercontent.com/53329734/107840757-dd79dc00-6df8-11eb-9008-0179c5979672.png)
+### jasic
+
+ * no line number
+
+### namazu
+
+ * no line number
+ * no eol terminator
+ * nested for doesn't work
+
+### shakeo
+
+ * print sin() only
+
+## cocoa
+
+ * use line number
+ * no eol terminator
+
+## References
+
+ * https://github.com/quwahara/Calc
+ * https://github.com/verhas/jScriptBasic
+ * https://github.com/mass-0910/emu-basic
+ * https://github.com/mayuropensource/PuffinBASIC
+ * https://github.com/EgonOlsen71/basicv2
+ * https://github.com/namazu510/basic-interpreter
