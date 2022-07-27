@@ -18,12 +18,12 @@
 
 package net.sf.cocoa.basic.statement;
 
+import net.sf.cocoa.basic.BasicRuntimeError;
 import net.sf.cocoa.basic.Statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 
@@ -46,11 +46,11 @@ import net.sf.cocoa.basic.Program;
  */
 public class RETURNStatement extends Statement {
 
-    public RETURNStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public RETURNStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(RETURN);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         Statement s;
         do {
             s = pgm.pop();
@@ -59,7 +59,7 @@ public class RETURNStatement extends Statement {
         } while (s != null);
 
         if (s == null)
-            throw new BASICRuntimeError("RETURN without GOSUB");
+            throw new BasicRuntimeError("RETURN without GOSUB");
         return pgm.nextStatement(s);
     }
 

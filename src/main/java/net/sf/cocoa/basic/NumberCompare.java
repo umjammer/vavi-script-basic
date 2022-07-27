@@ -23,8 +23,8 @@ import net.sf.cocoa.util.Comparator;
 class NumberCompare implements Comparator {
 
     public int compare(Object a, Object b) {
-        int x = ((Integer) a).intValue();
-        int y = ((Integer) b).intValue();
+        int x = (Integer) a;
+        int y = (Integer) b;
 
         if (x < y)
             return -1;

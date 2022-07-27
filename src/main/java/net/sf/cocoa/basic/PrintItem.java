@@ -20,6 +20,7 @@ package net.sf.cocoa.basic;
 
 import java.io.PrintStream;
 
+
 public class PrintItem {
     public final static int EXPRESSION = 0;
     public final static int STRING_VARIABLE = 1;
@@ -38,28 +39,28 @@ public class PrintItem {
     private static final String S_TAB = "\t";
     private static final String S_SEMI = "";
 
-    public String value(Program pgm, int c) throws BASICRuntimeError {
+    public String value(Program pgm, int c) throws BasicRuntimeError {
         switch (type) {
-            case EXPRESSION :
-                Expression e = (Expression)thing;
-                if (thing instanceof BooleanExpression) {
-                    double zz = ((Expression)thing).value(pgm);
-                    return (zz == 1) ? "TRUE" : "FALSE";
-                }
-                if (e.isString()) {
-                    return e.stringValue(pgm, c);
-                }
-                return (" "+e.value(pgm)+" ");
-            case STRING_VARIABLE :
-                return (pgm.getString((Variable)thing));
-            case STRING_CONSTANT :
-                return ((String)thing);
-            case TAB:
-                return (S_TAB);
-            case SEMI:
-                return(S_SEMI);
-            default:
-                return "BOGUS PRINTITEM";
+        case EXPRESSION:
+            Expression e = (Expression) thing;
+            if (thing instanceof BooleanExpression) {
+                double zz = ((Expression) thing).value(pgm);
+                return (zz == 1) ? "TRUE" : "FALSE";
+            }
+            if (e.isString()) {
+                return e.stringValue(pgm, c);
+            }
+            return (" " + e.value(pgm) + " ");
+        case STRING_VARIABLE:
+            return (pgm.getString((Variable) thing));
+        case STRING_CONSTANT:
+            return ((String) thing);
+        case TAB:
+            return (S_TAB);
+        case SEMI:
+            return (S_SEMI);
+        default:
+            return "BOGUS PRINTITEM";
         }
     }
 
@@ -69,37 +70,37 @@ public class PrintItem {
 
     public String unparse() {
         switch (type) {
-            case EXPRESSION :
-                return ((Expression) thing).unparse();
-            case STRING_VARIABLE:
-                return ((Variable)thing).unparse();
-            case STRING_CONSTANT:
-                return ("\""+(String)thing+"\"");
-            case TAB:
-                return (", ");
-            case SEMI:
-                return ("; ");
+        case EXPRESSION:
+            return ((Expression) thing).unparse();
+        case STRING_VARIABLE:
+            return ((Variable) thing).unparse();
+        case STRING_CONSTANT:
+            return ("\"" + thing + "\"");
+        case TAB:
+            return (", ");
+        case SEMI:
+            return ("; ");
         }
         return "BOGUS";
     }
 
     void print(PrintStream p) {
         switch (type) {
-            case EXPRESSION :
-                ((Expression) thing).print(p);
-                return;
-            case STRING_VARIABLE:
-                p.print((String)thing);
-                return;
-            case STRING_CONSTANT:
-                p.print("\""+(String)thing+"\"");
-                return;
-            case TAB:
-                p.print(",");
-                return;
-            case SEMI:
-                p.print(";");
-                return;
+        case EXPRESSION:
+            ((Expression) thing).print(p);
+            return;
+        case STRING_VARIABLE:
+            p.print((String) thing);
+            return;
+        case STRING_CONSTANT:
+            p.print("\"" + thing + "\"");
+            return;
+        case TAB:
+            p.print(",");
+            return;
+        case SEMI:
+            p.print(";");
+            return;
         }
     }
 }

@@ -24,12 +24,13 @@ package net.sf.cocoa.basic;
  */
 public class Token {
 
-    protected Token() { }
+    protected Token() {
+    }
 
-    final static String names[] = {
-        "symbol", "command", "constant", "function", "keyword",
-        "eol",    "string",  "error",    "string variable",
-        "numeric variable",  "boolean operator", "operator",
+    final static String[] names = {
+            "symbol", "command", "constant", "function", "keyword",
+            "eol", "string", "error", "string variable",
+            "numeric variable", "boolean operator", "operator",
     };
 
     /** Token is a special symbol (numeric value) */
@@ -71,9 +72,12 @@ public class Token {
     /** Token is a variable */
     public final static int VARIABLE = 12;
 
-    protected int     type;     // this token's type
-    protected double  nValue;     // Its numeric value (if it has one)
-    protected String  sValue;     // Its string value (if it has one)
+    /** this token's type */
+    protected int type;
+    /** Its numeric value (if it has one) */
+    protected double nValue;
+    /** Its string value (if it has one) */
+    protected String sValue;
 
     public double numValue() {
         return nValue;
@@ -112,34 +116,34 @@ public class Token {
      */
     Token(int t, int v) {
         type = t;
-        nValue = (double) v;
+        nValue = v;
     }
 
     /**
      * Create a token with both a string and a numeric value.
      */
-     Token(int t, String sv, int iv) {
+    Token(int t, String sv, int iv) {
         type = t;
         sValue = sv;
-        nValue = (double) iv;
-     }
+        nValue = iv;
+    }
 
     public String unparse() {
         switch (type) {
-            case STRING:
-                return "\""+sValue+"\"";
-            case CONSTANT:
-                return ""+nValue;
-            default:
-                return "Token ("+names[type]+")";
+        case STRING:
+            return "\"" + sValue + "\"";
+        case CONSTANT:
+            return "" + nValue;
+        default:
+            return "Token (" + names[type] + ")";
         }
     }
 
     public String toString() {
-        return ("TOKEN: Type="+names[type]+", Numeric Value = "+nValue+", String Value = '"+sValue+"'");
+        return ("TOKEN: Type=" + names[type] + ", Numeric Value = " + nValue + ", String Value = '" + sValue + "'");
     }
 
-    static final boolean isSymbol(Token t, char s) {
+    static boolean isSymbol(Token t, char s) {
         return ((t != null) && (t.typeNum() == SYMBOL) && (t.numValue() == s));
     }
 
@@ -156,5 +160,4 @@ public class Token {
             return;
         nValue = -nValue;
     }
-
- }
+}

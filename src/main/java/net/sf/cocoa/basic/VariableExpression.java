@@ -39,19 +39,19 @@ public class VariableExpression extends Expression {
         p.print(v.toString());
     }
 
-    public double value(Program pgm) throws BASICRuntimeError {
+    public double value(Program pgm) throws BasicRuntimeError {
         if (v.isString())
             return 0;
         return (pgm.getVariable(v));
     }
 
-    String stringValue(Program pgm, int c) throws BASICRuntimeError {
+    String stringValue(Program pgm, int c) throws BasicRuntimeError {
         if (v.isString())
             return pgm.getString(v);
         return ("" + pgm.getVariable(v));
     }
 
-    public String stringValue(Program pgm) throws BASICRuntimeError {
+    public String stringValue(Program pgm) throws BasicRuntimeError {
         if (v.isString())
             return pgm.getString(v);
         return ("" + pgm.getVariable(v));
@@ -64,7 +64,7 @@ public class VariableExpression extends Expression {
     /**
      * Add the value of this variable to the trace record.
      */
-    public void trace(RedBlackTree tracer) {
+    public void trace(RedBlackTree<?> tracer) {
         tracer.put(v.name, this);
         if (v.isArray() && (v.numExpn() != 0)) {
             for (int i = 0; i < v.numExpn(); i++) {

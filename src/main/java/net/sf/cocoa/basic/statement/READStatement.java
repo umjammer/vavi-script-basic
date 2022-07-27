@@ -23,8 +23,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 import net.sf.cocoa.basic.Statement;
@@ -50,26 +50,26 @@ public class READStatement extends Statement {
 
     List<Token> args;
 
-    public READStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public READStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(READ);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
-        for (int i = 0; i < args.size(); i++) {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
+        for (Token arg : args) {
             Variable vi;
             Token q = pgm.popData();
             if (q == null)
-                throw new BASICRuntimeError("READ statement is out of data.");
-            vi = (Variable) args.get(i);
-            if (! vi.isString()) {
+                throw new BasicRuntimeError("READ statement is out of data.");
+            vi = (Variable) arg;
+            if (!vi.isString()) {
                 if (q.typeNum() != Token.CONSTANT)
-                    throw new BASICRuntimeError("Type mismatch reading variable "+vi);
+                    throw new BasicRuntimeError("Type mismatch reading variable " + vi);
                 pgm.setVariable(vi, q.numValue());
             } else {
                 if (q.typeNum() != Token.STRING)
-                    throw new BASICRuntimeError("Type mismatch reading variable "+vi);
+                    throw new BasicRuntimeError("Type mismatch reading variable " + vi);
                 pgm.setVariable(vi, q.stringValue());
             }
         }
@@ -77,12 +77,12 @@ public class READStatement extends Statement {
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("READ ");
         for (int i = 0; i < args.size(); i++) {
             Variable vi = (Variable) args.get(i);
             if (i < (args.size()-1)) {
-                sb.append(vi.unparse()+", ");
+                sb.append(vi.unparse()).append(", ");
             } else {
                 sb.append(vi.unparse());
             }
@@ -93,7 +93,7 @@ public class READStatement extends Statement {
     /**
      * Parse READ Statement.
      */
-    private static void parse(READStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(READStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t;
         s.args = new ArrayList<>();
         boolean needComma = false;
@@ -115,7 +115,7 @@ public class READStatement extends Statement {
             if (t.typeNum() == Token.VARIABLE) {
                 s.args.add(t);
             } else {
-                throw new BASICSyntaxError("malformed READ statement.");
+                throw new BasicSyntaxError("malformed READ statement.");
             }
             needComma = true;
         }

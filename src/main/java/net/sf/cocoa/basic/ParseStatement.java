@@ -54,8 +54,8 @@ public class ParseStatement extends Statement {
      * Here we implement the abstract methods of Statement, they all generate errors
      * since ParseStatement isn't a "real" statement.
      */
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
-        throw new BASICRuntimeError("Attempt to execute a statement parser object.");
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
+        throw new BasicRuntimeError("Attempt to execute a statement parser object.");
     }
 
     public String unparse() {
@@ -69,7 +69,7 @@ public class ParseStatement extends Statement {
     /**
      * Given a 'full' tokenizer buffer, return us a parsed statement.
      */
-    public static Statement statement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public static Statement statement(LexicalTokenizer lt) throws BasicSyntaxError {
         Statement s = doParse(lt);
         // System.out.println("UNPARSE = '"+s.unparse()+"'");
         return s;
@@ -79,7 +79,7 @@ public class ParseStatement extends Statement {
      * This method returns a parsed statemnet, it throws an exception if an
      * error occurred.
      */
-    static Statement doParse(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Statement doParse(LexicalTokenizer lt) throws BasicSyntaxError {
         Statement s;
         Token   t;
 
@@ -96,12 +96,12 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     }
-                    throw new BASICSyntaxError(extraError);
+                    throw new BasicSyntaxError(extraError);
                 case '\'':
                     s = new REMStatement(lt);
                     return s;
                 default :
-                    throw new BASICSyntaxError("Illegal statement symbol start?");
+                    throw new BasicSyntaxError("Illegal statement symbol start?");
             }
         }
 
@@ -113,7 +113,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':')) {
                         s.nxt = statement(lt);
                     } else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -123,7 +123,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':')) {
                         s.nxt = statement(lt);
                     } else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -131,7 +131,7 @@ public class ParseStatement extends Statement {
                     s = new ENDStatement(lt);
                     t = lt.nextToken();
                     if (t.typeNum() != Token.EOL) {
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     }
                     return s;
 
@@ -141,7 +141,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     return s;
 
                 case STOP:
@@ -150,7 +150,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':')) {
                         s.nxt = statement(lt);
                     } else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -161,14 +161,14 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     return s;
 
                 case GOTO:
                     s = new GOTOStatement(lt);
                     t = lt.nextToken();
                     if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     return s;
 
                 case GOSUB:
@@ -177,7 +177,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -185,7 +185,7 @@ public class ParseStatement extends Statement {
                     s = new RETURNStatement(lt);
                     t = lt.nextToken();
                     if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -199,13 +199,13 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     }
-                    throw new BASICSyntaxError(extraError);
+                    throw new BasicSyntaxError(extraError);
 
                 case IF:
                     s = new IFStatement(lt);
                     t = lt.nextToken();
                     if ((t != null) && (t.typeNum() != Token.EOL))
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     return s;
 
                 case DATA:
@@ -218,7 +218,7 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     }
-                    throw new BASICSyntaxError(extraError);
+                    throw new BasicSyntaxError(extraError);
 
                 case RESTORE:
                     s = new RESTOREStatement(lt);
@@ -226,7 +226,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -239,7 +239,7 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     }
-                    throw new BASICSyntaxError(extraError);
+                    throw new BasicSyntaxError(extraError);
 
                 case ON:
                     s = new ONStatement(lt);
@@ -247,7 +247,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -261,7 +261,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
 
                     return s;
 
@@ -271,7 +271,7 @@ public class ParseStatement extends Statement {
                     if (t.isSymbol(':'))
                         s.nxt = statement(lt);
                     else if (t.typeNum() != Token.EOL)
-                        throw new BASICSyntaxError(extraError);
+                        throw new BasicSyntaxError(extraError);
                     return s;
 
                 case LET:
@@ -283,9 +283,9 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     } else if (t.isSymbol(')')) {
-                        throw new BASICSyntaxError("Mismatched parenthesis in LET statement.");
+                        throw new BasicSyntaxError("Mismatched parenthesis in LET statement.");
                     }
-                    throw new BASICSyntaxError("Unexpected text following LET statement.");
+                    throw new BasicSyntaxError("Unexpected text following LET statement.");
 
                 case INPUT :
                     s = new INPUTStatement(lt);
@@ -296,10 +296,10 @@ public class ParseStatement extends Statement {
                         s.nxt = statement(lt);
                         return s;
                     }
-                    throw new BASICSyntaxError(extraError);
+                    throw new BasicSyntaxError(extraError);
 
                 default:
-                    throw new BASICSyntaxError("Invalid keyword");
+                    throw new BasicSyntaxError("Invalid keyword");
             }
         } else if (t.typeNum() == Token.VARIABLE) {
             lt.unGetToken();
@@ -311,9 +311,9 @@ public class ParseStatement extends Statement {
                 s.nxt = statement(lt);
                 return s;
             }
-            throw new BASICSyntaxError(extraError);
+            throw new BasicSyntaxError(extraError);
 
         }
-        throw new BASICSyntaxError("Unrecognized statement");
+        throw new BasicSyntaxError("Unrecognized statement");
     }
 }

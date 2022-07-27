@@ -41,21 +41,21 @@ public class Variable extends Token {
      * If the variable is in the symbol table these values are
      * initialized.
      */
-    int ndx[];  // array indices.
-    int mult[]; // array multipliers
-    double nArrayValues[];
-    String sArrayValues[];
+    int[] ndx;  // array indices.
+    int[] mult; // array multipliers
+    double[] nArrayValues;
+    String[] sArrayValues;
 
     /*
      * If this is a variable array reference, these expressions are
      * initialized.
      */
-    Expression expns[];
+    Expression[] expns;
 
     /**
      * Create a reference to this array.
      */
-    Variable(String someName, Expression ee[]) {
+    Variable(String someName, Expression[] ee) {
         type = VARIABLE;
         if (someName.endsWith("$")) {
             subType = STRING_ARRAY;
@@ -91,22 +91,22 @@ public class Variable extends Token {
             return name;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(name);
         sb.append("( ");
         if (ndx != null) {
             for (int i = 0; i < ndx.length; i++) {
                 if (i < (ndx.length-1))
-                    sb.append(ndx[i]+", ");
+                    sb.append(ndx[i]).append(", ");
                 else
-                    sb.append(ndx[i]+")");
+                    sb.append(ndx[i]).append(")");
             }
         } else {
             for (int i = 0; i < expns.length; i++) {
                 if (i < (expns.length-1))
-                    sb.append(expns[i].unparse()+", ");
+                    sb.append(expns[i].unparse()).append(", ");
                 else
-                    sb.append(expns[i].unparse()+")");
+                    sb.append(expns[i].unparse()).append(")");
             }
         }
         return sb.toString();
@@ -115,7 +115,7 @@ public class Variable extends Token {
     /**
      * Create a symbol table entry for this array.
      */
-    Variable(String someName, int ii[]) {
+    Variable(String someName, int[] ii) {
         int offset;
         ndx = ii;
         mult = new int[ii.length];
@@ -142,14 +142,14 @@ public class Variable extends Token {
      * indices are different, or there values exceed the max value
      * here in the symbol table entry, a runtime error is thrown.
      */
-    private int computeIndex(int ii[]) throws BASICRuntimeError {
+    private int computeIndex(int[] ii) throws BasicRuntimeError {
         int offset = 0;
         if ((ndx == null) || (ii.length != ndx.length))
-            throw new BASICRuntimeError("Wrong number of indices.");
+            throw new BasicRuntimeError("Wrong number of indices.");
 
         for (int i = 0; i < ndx.length; i++) {
             if ((ii[i] < 1) || (ii[i] > ndx[i]))
-                throw new BASICRuntimeError("Index out of range.");
+                throw new BasicRuntimeError("Index out of range.");
             offset = offset +  (ii[i]-1) * mult[i];
         }
         return offset;
@@ -166,7 +166,7 @@ public class Variable extends Token {
         return 0;
     }
 
-    double numValue(int ii[]) throws BASICRuntimeError {
+    double numValue(int[] ii) throws BasicRuntimeError {
         return nArrayValues[computeIndex(ii)];
     }
 
@@ -174,7 +174,7 @@ public class Variable extends Token {
      * Returns value as a string, even if this internally is
      * a number.
      */
-    String stringValue(int ii[]) throws BASICRuntimeError {
+    String stringValue(int[] ii) throws BasicRuntimeError {
         if (subType == NUMBER_ARRAY)
             return ""+nArrayValues[computeIndex(ii)];
         return sArrayValues[computeIndex(ii)];
@@ -205,18 +205,18 @@ public class Variable extends Token {
         sValue = s;
     }
 
-    void setValue(double v, int ii[]) throws BASICRuntimeError {
+    void setValue(double v, int[] ii) throws BasicRuntimeError {
         int offset = computeIndex(ii);
         if (nArrayValues == null) {
-            throw new BASICRuntimeError("ARRAY storage not initialized.");
+            throw new BasicRuntimeError("ARRAY storage not initialized.");
         }
         nArrayValues[offset] = v;
     }
 
-    void setValue(String v, int ii[]) throws BASICRuntimeError {
+    void setValue(String v, int[] ii) throws BasicRuntimeError {
         int offset = computeIndex(ii);
         if (sArrayValues == null) {
-            throw new BASICRuntimeError("ARRAY storage not initialized.");
+            throw new BasicRuntimeError("ARRAY storage not initialized.");
         }
         sArrayValues[offset] = v;
     }

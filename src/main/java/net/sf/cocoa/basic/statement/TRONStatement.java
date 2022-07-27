@@ -21,8 +21,8 @@ package net.sf.cocoa.basic.statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.Expression;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.ParseExpression;
@@ -43,13 +43,13 @@ public class TRONStatement extends Statement {
     // This is the line number to transfer control too.
     Expression traceFile;
 
-    public TRONStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public TRONStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(TRON);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         if (traceFile != null)
             pgm.trace(true, traceFile.stringValue(pgm));
         pgm.trace(true);
@@ -63,7 +63,7 @@ public class TRONStatement extends Statement {
     /**
      * Parse TRON Statement.
      */
-    private static void parse(TRONStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(TRONStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
         if ((t.typeNum() == Token.EOL) || (t.isSymbol(':'))) {
             lt.unGetToken();
@@ -72,7 +72,7 @@ public class TRONStatement extends Statement {
         lt.unGetToken();
         s.traceFile = ParseExpression.expression(lt);
         if (! s.traceFile.isString()) {
-            throw new BASICSyntaxError("String expression expected.");
+            throw new BasicSyntaxError("String expression expected.");
         }
     }
 }

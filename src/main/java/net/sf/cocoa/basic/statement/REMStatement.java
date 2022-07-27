@@ -17,12 +17,12 @@
  */
 package net.sf.cocoa.basic.statement;
 
+import net.sf.cocoa.basic.BasicRuntimeError;
 import net.sf.cocoa.basic.Statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 
@@ -37,13 +37,13 @@ import net.sf.cocoa.basic.Program;
 public class REMStatement extends Statement {
     String comment;
 
-    public REMStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public REMStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(REM);
 
         comment = lt.asString();
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         return pgm.nextStatement(this);
     }
 

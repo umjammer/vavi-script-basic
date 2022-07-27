@@ -21,11 +21,11 @@ package net.sf.cocoa.basic;
 /**
  * This class implements a recursive-descent parser for the expression grammar
  * we have designed for BASIC.
- *
+ * <p>
  * This grammar is defined with some nonterminals that allow us to embed the
  * precedence relationship of operators into the grammar. The grammar is defined
  * as follows:
- *
+ * <pre>
  * ELEMENT    ::=   id  | ( expression ) | function
  * PRIMARY    ::=   - ELEMENT | ! ELEMENT | .NOT. ELEMENT | ELEMENT
  * FACTOR     ::=   PRIMARY ** FACTOR | PRIMARY
@@ -54,21 +54,21 @@ package net.sf.cocoa.basic;
  *  4.  *, /
  *  5.  **
  *  6.  unary -, unary !, unary .NOT.
- *
+ * </pre>
  */
 public class ParseExpression extends Expression {
 
-    static Expression element(LexicalTokenizer lt) throws BASICSyntaxError {
-        Expression result = null;
+    static Expression element(LexicalTokenizer lt) throws BasicSyntaxError {
+        Expression result;
 
         Token t = lt.nextToken();
 
         if (t.isSymbol('(')) {
             result = expression(lt);
             t = lt.nextToken();
-            if (! t.isSymbol(')')) {
+            if (!t.isSymbol(')')) {
                 lt.unGetToken();
-                throw new BASICSyntaxError("mismatched parenthesis in expression");
+                throw new BasicSyntaxError("mismatched parenthesis in expression");
             }
         } else if (t.typeNum() == Token.CONSTANT) {
             result = new ConstantExpression(t.numValue());
@@ -77,16 +77,16 @@ public class ParseExpression extends Expression {
         } else if (t.typeNum() == Token.VARIABLE) {
             result = new VariableExpression((Variable) t);
         } else if (t.typeNum() == Token.FUNCTION) {
-            result = FunctionExpression.parse((int)t.numValue(), lt);
+            result = FunctionExpression.parse((int) t.numValue(), lt);
         } else {
             lt.unGetToken();
-            throw new BASICSyntaxError("Unexpected symbol in expression.");
+            throw new BasicSyntaxError("Unexpected symbol in expression.");
         }
 
         return result;
     }
 
-    static Expression primary(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression primary(LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
 
         if (t.isOp(OP_NOT)) {
@@ -100,7 +100,7 @@ public class ParseExpression extends Expression {
         return element(lt);
     }
 
-    static Expression factor(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression factor(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
@@ -116,7 +116,7 @@ public class ParseExpression extends Expression {
         return result;
     }
 
-    static Expression term(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression term(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
@@ -137,7 +137,7 @@ public class ParseExpression extends Expression {
         return result;
     }
 
-    static Expression sum(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression sum(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
@@ -158,7 +158,7 @@ public class ParseExpression extends Expression {
         return result;
     }
 
-    static Expression logic(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression logic(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
@@ -171,7 +171,7 @@ public class ParseExpression extends Expression {
             if (t.isOp(OP_AND)) {
                 result = new Expression(OP_AND, result, sum(lt));
             } else if (t.isOp(OP_XOR)) {
-                result =  new Expression(OP_XOR, result, sum(lt));
+                result = new Expression(OP_XOR, result, sum(lt));
             } else if (t.isOp(OP_IOR)) {
                 result = new Expression(OP_IOR, result, sum(lt));
             } else
@@ -181,29 +181,29 @@ public class ParseExpression extends Expression {
         return result;
     }
 
-    static Expression string(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression string(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
         result = logic(lt);
-        if (! result.isString())
+        if (!result.isString())
             return result;
         while (true) {
             Expression arg2;
             t = lt.nextToken();
-            if (! t.isOp(OP_ADD)) {
+            if (!t.isOp(OP_ADD)) {
                 lt.unGetToken();
                 return result;
             }
             arg2 = logic(lt);
-            if (! arg2.isString()) {
-                throw new BASICSyntaxError("Only add is allowed in string expressions.");
+            if (!arg2.isString()) {
+                throw new BasicSyntaxError("Only add is allowed in string expressions.");
             }
             result = new StringExpression(OP_ADD, result, arg2);
         }
     }
 
-    static Expression relation(LexicalTokenizer lt) throws BASICSyntaxError {
+    static Expression relation(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
         Token t;
 
@@ -213,33 +213,33 @@ public class ParseExpression extends Expression {
             lt.unGetToken();
             return result;
         }
-        switch ((int)t.numValue()) {
-            case OP_EQ:
-                result = new BooleanExpression(OP_EQ, result, string(lt));
-                break;
-            case OP_NE:
-                result = new BooleanExpression(OP_NE, result, string(lt));
-                break;
-            case OP_LT:
-                result = new BooleanExpression(OP_LT, result, string(lt));
-                break;
-            case OP_LE:
-                result = new BooleanExpression(OP_LE, result, string(lt));
-                break;
-            case OP_GT:
-                result = new BooleanExpression(OP_GT, result, string(lt));
-                break;
-            case OP_GE:
-                result = new BooleanExpression(OP_GE, result, string(lt));
-                break;
+        switch ((int) t.numValue()) {
+        case OP_EQ:
+            result = new BooleanExpression(OP_EQ, result, string(lt));
+            break;
+        case OP_NE:
+            result = new BooleanExpression(OP_NE, result, string(lt));
+            break;
+        case OP_LT:
+            result = new BooleanExpression(OP_LT, result, string(lt));
+            break;
+        case OP_LE:
+            result = new BooleanExpression(OP_LE, result, string(lt));
+            break;
+        case OP_GT:
+            result = new BooleanExpression(OP_GT, result, string(lt));
+            break;
+        case OP_GE:
+            result = new BooleanExpression(OP_GE, result, string(lt));
+            break;
         }
         lt.unGetToken();
         return result;
     }
 
-    public static Expression expression(LexicalTokenizer lt) throws BASICSyntaxError {
+    public static Expression expression(LexicalTokenizer lt) throws BasicSyntaxError {
         Expression result;
-        Token   t;
+        Token t;
 
         result = relation(lt);
         while (true) {

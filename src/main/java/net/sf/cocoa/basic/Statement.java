@@ -41,7 +41,7 @@ public abstract class Statement {
     /**
      * These are all of the statement keywords we can parse.
      */
-    protected final static String keywords[] = {
+    protected final static String[] keywords = {
         "*NONE*", "goto", "gosub", "return", "print",
          "if", "then", "end", "data", "restore", "read",
          "on", "rem", "for", "to", "next", "step", "gosub",
@@ -95,12 +95,12 @@ public abstract class Statement {
      * runtime error (if any) is caught so that the line number and statement can
      * be attached to the result and then it is re-thrown.
      */
-    Statement execute(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    Statement execute(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         Statement nxt = null;
         try {
             nxt = doit(pgm, in, out);
-        } catch (BASICRuntimeError e) {
-            throw new BASICRuntimeError(this, e.getMsg());
+        } catch (BasicRuntimeError e) {
+            throw new BasicRuntimeError(this, e.getMsg());
         }
         return nxt;
     }
@@ -111,7 +111,7 @@ public abstract class Statement {
      * the string from the parse tree.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("BASIC Statement :");
         if (orig != null) {
             sb.append(orig);
@@ -157,11 +157,11 @@ public abstract class Statement {
      * This method "runs" this statement and returns a reference on
      * the next statement to run or null if there is no next statement.
      *
-     * @throws BASICRuntimeError if there is a problem during statement
+     * @throws BasicRuntimeError if there is a problem during statement
      * execution such as divide by zero etc.
      */
     protected abstract Statement doit(Program pgm, InputStream in, PrintStream out)
-    throws BASICRuntimeError;
+    throws BasicRuntimeError;
 
     protected RedBlackTree<VariableExpression> vars; // variables used by this statement.
     /**
@@ -169,7 +169,7 @@ public abstract class Statement {
      * the program is doing.
      */
     void trace(Program pgm, PrintStream ps) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String n;
         sb.append("**:");
 
@@ -185,14 +185,14 @@ public abstract class Statement {
         sb.append(n);
         sb.append(':');
         sb.append(unparse());
-        ps.println(sb.toString());
+        ps.println(sb);
         if (vars != null) {
             for (Enumeration<VariableExpression> e = vars.elements(); e.hasMoreElements(); ) {
-                VariableExpression vi = (VariableExpression) e.nextElement();
-                String  t = null;
+                VariableExpression vi = e.nextElement();
+                String  t;
                 try {
                     t = vi.stringValue(pgm);
-                } catch (BASICRuntimeError bse) {
+                } catch (BasicRuntimeError bse) {
                     t = "Not yet defined.";
                 }
                 ps.println("        :"+vi.unparse()+" = "+(vi.isString() ? "\""+t+"\"" : t));

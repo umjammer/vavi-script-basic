@@ -28,12 +28,12 @@ import java.util.List;
  */
 public class LexicalTokenizer {
 
-    int currentPos = 0;
+    int currentPos;
     int previousPos = 0;
     int markPos = 0;
-    char buffer[];
+    char[] buffer;
 
-    public LexicalTokenizer(char data[]) {
+    public LexicalTokenizer(char[] data) {
         buffer = data;
         currentPos = 0;
     }
@@ -63,7 +63,7 @@ public class LexicalTokenizer {
     /**
      * Reset the tokenizer with a new data buffer.
      */
-    void reset(char buf[]) {
+    void reset(char[] buf) {
         buffer = buf;
         currentPos = 0;
     }
@@ -97,8 +97,8 @@ public class LexicalTokenizer {
         int errorPos = previousPos;
         currentPos = 0;
         String txt = asString();
-        StringBuffer sb = new StringBuffer();
-        sb.append(txt+"\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append(txt).append("\n");
         for (int i = 0; i < errorPos; i++) {
             sb.append('-');
         }
@@ -118,11 +118,11 @@ public class LexicalTokenizer {
     }
 
     // multiple expressions can be chained with these operators
-    private final static String boolOps[] = {
+    private final static String[] boolOps = {
         ".and.", ".or.", ".xor.", ".not."
     };
 
-    private final static int boolTokens[] = {
+    private final static int[] boolTokens = {
         Expression.OP_BAND, Expression.OP_BIOR, Expression.OP_BXOR, Expression.OP_BNOT,
     };
 
@@ -131,7 +131,7 @@ public class LexicalTokenizer {
      */
     Token parseBooleanOp() {
         int oldPos = currentPos;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = 0;
         Token r = null;
 
@@ -160,7 +160,6 @@ public class LexicalTokenizer {
         currentPos = oldPos;
         return null;
     }
-
 
     /**
      * This method will attempt to parse out a numeric constant.
@@ -294,15 +293,15 @@ public class LexicalTokenizer {
         switch (buffer[currentPos]) {
 
             // Various lexical symbols that have meaning.
-            case '+' :
+            case '+':
                 currentPos++;
                 return new Token(Token.OPERATOR, "+", Expression.OP_ADD);
 
-            case '-' :
+            case '-':
                 currentPos++;
                 return new Token(Token.OPERATOR, "-", Expression.OP_SUB);
 
-            case '*' :
+            case '*':
                 if (buffer[currentPos+1] == '*') {
                     currentPos += 2;
                     return new Token(Token.OPERATOR, "**", Expression.OP_EXP);
@@ -310,31 +309,31 @@ public class LexicalTokenizer {
                 currentPos++;
                 return new Token(Token.OPERATOR, "*", Expression.OP_MUL);
 
-            case '/' :
+            case '/':
                 currentPos++;
                 return new Token(Token.OPERATOR, "/", Expression.OP_DIV);
 
-            case '^' :
+            case '^':
                 currentPos++;
                 return new Token(Token.OPERATOR, "^", Expression.OP_XOR);
 
-            case '&' :
+            case '&':
                 currentPos++;
                 return new Token(Token.OPERATOR, "&", Expression.OP_AND);
 
-            case '|' :
+            case '|':
                 currentPos++;
                 return new Token(Token.OPERATOR, "|", Expression.OP_IOR);
 
-            case '!' :
+            case '!':
                 currentPos++;
                 return new Token(Token.OPERATOR, "!", Expression.OP_NOT);
 
-            case '=' :
+            case '=':
                 currentPos++;
                 return new Token(Token.OPERATOR, "=", Expression.OP_EQ);
 
-            case '<' :
+            case '<':
                 if (buffer[currentPos+1] == '=') {
                     currentPos += 2;
                     return new Token(Token.OPERATOR, "<=", Expression.OP_LE);
@@ -345,7 +344,7 @@ public class LexicalTokenizer {
                 currentPos++;
                 return new Token(Token.OPERATOR, "<", Expression.OP_LT);
 
-            case '>' :
+            case '>':
                 if (buffer[currentPos+1] == '=') {
                     currentPos += 2;
                     return new Token(Token.OPERATOR, ">=", Expression.OP_GE);
@@ -356,16 +355,16 @@ public class LexicalTokenizer {
                 currentPos++;
                 return new Token(Token.OPERATOR, ">", Expression.OP_GT);
 
-            case '(' :
+            case '(':
             case '\'':
-            case '?' :
-            case ')' :
-            case ':' :
-            case ';' :
-            case ',' :
+            case '?':
+            case ')':
+            case ':':
+            case ';':
+            case ',':
                 return new Token(Token.SYMBOL, (double) buffer[currentPos++]);
 
-            case '.' :
+            case '.':
                 r = parseBooleanOp();
                 if (r != null)
                     return r;
@@ -386,23 +385,23 @@ public class LexicalTokenizer {
                 return new Token(Token.SYMBOL, (double) buffer[currentPos++]);
 
             // process EOL characters. (dump <CR><LF> as just EOL)
-            case '\r' :
-            case '\n' :
+            case '\r':
+            case '\n':
                 while (currentPos < buffer.length)
                     currentPos++;
                 return EOLToken;
 
             // text enclosed in "quotes" is a string constant.
 
-            case '"' :
-                StringBuffer sb = new StringBuffer();
+            case '"':
+                StringBuilder sb = new StringBuilder();
                 currentPos++;
 
                 while (true) {
                     switch((int) buffer[currentPos]) {
                         case '\n':
                             return new Token(Token.ERROR, "Missing end quote.");
-                        case '"' :
+                        case '"':
                             if (buffer[currentPos+1] == '"') {
                                 currentPos++;
                                 sb.append('"');
@@ -411,7 +410,7 @@ public class LexicalTokenizer {
                                 return new Token(Token.STRING, sb.toString());
                             }
                             break;
-                        default :
+                        default:
                             sb.append(buffer[currentPos]);
                     }
                     currentPos++;
@@ -426,7 +425,7 @@ public class LexicalTokenizer {
             return new Token(Token.ERROR, "Unrecognized input.");
 
         /* compose an identifier */
-        StringBuffer q = new StringBuffer();
+        StringBuilder q = new StringBuilder();
 
         while (isLetter(buffer[currentPos]) || isDigit(buffer[currentPos])) {
             q.append(Character.toLowerCase(buffer[currentPos]));
@@ -469,14 +468,14 @@ public class LexicalTokenizer {
         if (buffer[currentPos] == '(') {
             currentPos++;
             List<Expression> expVec = new ArrayList<>();
-            Expression expn[];
+            Expression[] expn;
 
             // This line sets the maximum number of indices.
             for (int i = 0; i < 4; i++) {
                 Expression thisE = null;
                 try {
                     thisE = ParseExpression.expression(this);
-                } catch (BASICSyntaxError bse) {
+                } catch (BasicSyntaxError bse) {
                     return new Token(Token.ERROR, "Error parsing array index.");
                 }
                 expVec.add(thisE);

@@ -18,12 +18,12 @@
 
 package net.sf.cocoa.basic.statement;
 
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.Statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 import net.sf.cocoa.basic.Token;
@@ -51,20 +51,20 @@ public class GOSUBStatement extends Statement {
     // This is the line number to transfer control too.
     int lineTarget;
 
-    public GOSUBStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public GOSUBStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(GOSUB);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         Statement s;
         pgm.push(this);
         s = pgm.getStatement(lineTarget);
         if (s != null) {
             return s;
         }
-        throw new BASICRuntimeError("GOSUB non-existent line "+lineTarget+".");
+        throw new BasicRuntimeError("GOSUB non-existent line "+lineTarget+".");
     }
 
     public String unparse() {
@@ -74,12 +74,11 @@ public class GOSUBStatement extends Statement {
     /**
      * Parse GOSUB Statement.
      */
-    private static void parse(GOSUBStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(GOSUBStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
         if (t.typeNum() != Token.CONSTANT) {
-            throw new BASICSyntaxError("Line number required after GOSUB.");
+            throw new BasicSyntaxError("Line number required after GOSUB.");
         }
         s.lineTarget = (int) t.numValue();
     }
-
 }

@@ -21,13 +21,14 @@ package net.sf.cocoa.basic;
 import java.io.PrintStream;
 import java.util.Random;
 
+
 /**
  * This class implements the mathematical functions for BASIC. The tokenizer
  * will scan the input for one of the strings in <i>functions[]</i> and if
  * it finds it, it returns a token of FUNCTION with its value being that of
  * the index of the string into the array. (which are convientiently mapped
  * into named constants).
- *
+ * <p>
  * Parsing of the arguments to to the function are left up to the parse
  * method in this class.
  */
@@ -35,10 +36,10 @@ class FunctionExpression extends Expression {
 
     Expression sVar; // STRING function variable.
 
-    final static String functions[] = {
-        "rnd", "int", "sin", "cos", "tan", "atn", "sqr", "max", "min", "abs",
-        "left$", "right$", "mid$", "chr$", "len", "val", "spc$", "log", "fre",
-        "sgn", "tab", "str$",
+    final static String[] functions = {
+            "rnd", "int", "sin", "cos", "tan", "atn", "sqr", "max", "min", "abs",
+            "left$", "right$", "mid$", "chr$", "len", "val", "spc$", "log", "fre",
+            "sgn", "tab", "str$",
     };
 
     final static int RND = 0;
@@ -76,11 +77,11 @@ class FunctionExpression extends Expression {
     }
 
     public String toString() {
-        return "FunctionExpression:: '"+unparse()+"'";
+        return "FunctionExpression:: '" + unparse() + "'";
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(functions[oper].toUpperCase());
         sb.append("(");
@@ -110,86 +111,86 @@ class FunctionExpression extends Expression {
         oper = t;
     }
 
-    public double value(Program p) throws BASICRuntimeError {
+    public double value(Program p) throws BasicRuntimeError {
         try {
             switch (oper) {
-                case RND :
-                    if (r == null)
-                        r = p.getRandom();
-                    return (r.nextDouble() * arg2.value(p));
-                case INT :
-                    return Math.floor(arg2.value(p));
-                case SIN :
-                    return Math.sin(arg2.value(p));
-                case COS :
-                    return Math.cos(arg2.value(p));
-                case TAN :
-                    return Math.tan(arg2.value(p));
-                case ATN :
-                    return Math.atan(arg2.value(p));
-                case SQR :
-                    return Math.sqrt(arg2.value(p));
-                case MAX :
-                    return Math.max(arg1.value(p), arg2.value(p));
-                case MIN :
-                    return Math.min(arg1.value(p), arg2.value(p));
-                case ABS:
-                    return Math.abs(arg2.value(p));
-                case LEN:
-                    String s = arg2.stringValue(p);
-                    return (double) s.length();
-                case LOG:
-                    return Math.log(arg2.value(p));
-                case FRE:
-                    return 8192.0; // a round number.
-                case SGN:
-                    double v = arg2.value(p);
-                    if (v < 0) {
-                        return -1.0;
-                    } else if (v > 0) {
-                        return 1.0;
-                    }
-                    return 0.0;
-                case VAL:
-                    Double dd = null;
-                    String zz = (arg2.stringValue(p)).trim();
-                    try {
-                        dd = Double.valueOf(zz);
-                    } catch (NumberFormatException nfe) {
-                        throw new BASICRuntimeError("Invalid string for VAL function.");
-                    }
-                    return dd.doubleValue();
-                default :
-                    throw new BASICRuntimeError("Unknown or non-numeric function.");
+            case RND:
+                if (r == null)
+                    r = p.getRandom();
+                return (r.nextDouble() * arg2.value(p));
+            case INT:
+                return Math.floor(arg2.value(p));
+            case SIN:
+                return Math.sin(arg2.value(p));
+            case COS:
+                return Math.cos(arg2.value(p));
+            case TAN:
+                return Math.tan(arg2.value(p));
+            case ATN:
+                return Math.atan(arg2.value(p));
+            case SQR:
+                return Math.sqrt(arg2.value(p));
+            case MAX:
+                return Math.max(arg1.value(p), arg2.value(p));
+            case MIN:
+                return Math.min(arg1.value(p), arg2.value(p));
+            case ABS:
+                return Math.abs(arg2.value(p));
+            case LEN:
+                String s = arg2.stringValue(p);
+                return (double) s.length();
+            case LOG:
+                return Math.log(arg2.value(p));
+            case FRE:
+                return 8192.0; // a round number.
+            case SGN:
+                double v = arg2.value(p);
+                if (v < 0) {
+                    return -1.0;
+                } else if (v > 0) {
+                    return 1.0;
+                }
+                return 0.0;
+            case VAL:
+                Double dd = null;
+                String zz = (arg2.stringValue(p)).trim();
+                try {
+                    dd = Double.valueOf(zz);
+                } catch (NumberFormatException nfe) {
+                    throw new BasicRuntimeError("Invalid string for VAL function.");
+                }
+                return dd.doubleValue();
+            default:
+                throw new BasicRuntimeError("Unknown or non-numeric function.");
             }
         } catch (Exception e) {
-            if (e instanceof BASICRuntimeError)
-                throw (BASICRuntimeError) e;
+            if (e instanceof BasicRuntimeError)
+                throw (BasicRuntimeError) e;
             else
-                throw new BASICRuntimeError("Arithmetic Exception.");
+                throw new BasicRuntimeError("Arithmetic Exception.");
         }
     }
 
     public boolean isString() {
         switch (oper) {
-            case LEFT:
-            case RIGHT:
-            case MID:
-            case CHR:
-            case STR:
-            case SPC:
-            case TAB:
-                return true;
-            default:
-                return false;
+        case LEFT:
+        case RIGHT:
+        case MID:
+        case CHR:
+        case STR:
+        case SPC:
+        case TAB:
+            return true;
+        default:
+            return false;
         }
     }
 
-    public String stringValue(Program pgm) throws BASICRuntimeError {
+    public String stringValue(Program pgm) throws BasicRuntimeError {
         return stringValue(pgm, 0);
     }
 
-    String stringValue(Program pgm, int column) throws BASICRuntimeError {
+    String stringValue(Program pgm, int column) throws BasicRuntimeError {
         String ss = null;
         int len = 0;
 
@@ -198,39 +199,39 @@ class FunctionExpression extends Expression {
             len = ss.length();
         }
 
-        StringBuffer sb;
+        StringBuilder sb;
         int a;
         switch (oper) {
 
-            case LEFT:
-                return ss.substring(0, (int) arg2.value(pgm));
-            case RIGHT:
-                return ss.substring(len - (int) arg2.value(pgm));
-            case MID:
-                int t = (int) arg1.value(pgm);
-                return ss.substring(t-1, (t-1)+(int) arg2.value(pgm));
-            case CHR:
-                return ""+(char)arg2.value(pgm);
-            case STR:
-                return ""+arg2.value(pgm);
-            case SPC:
-                sb = new StringBuffer();
-                a = (int) arg2.value(pgm);
-                for (int i = 0; i < a; i++) {
-                    sb.append(' ');
-                }
-                return sb.toString();
+        case LEFT:
+            return ss.substring(0, (int) arg2.value(pgm));
+        case RIGHT:
+            return ss.substring(len - (int) arg2.value(pgm));
+        case MID:
+            int t = (int) arg1.value(pgm);
+            return ss.substring(t - 1, (t - 1) + (int) arg2.value(pgm));
+        case CHR:
+            return "" + (char) arg2.value(pgm);
+        case STR:
+            return "" + arg2.value(pgm);
+        case SPC:
+            sb = new StringBuilder();
+            a = (int) arg2.value(pgm);
+            for (int i = 0; i < a; i++) {
+                sb.append(' ');
+            }
+            return sb.toString();
 
-            case TAB:
-                a = (int) arg2.value(pgm);
-                sb = new StringBuffer();
-                for (int i = column; i < a; i++) {
-                    sb.append(' ');
-                }
-                return sb.toString();
+        case TAB:
+            a = (int) arg2.value(pgm);
+            sb = new StringBuilder();
+            for (int i = column; i < a; i++) {
+                sb.append(' ');
+            }
+            return sb.toString();
 
-            default:
-                return "Function not implemented yet.";
+        default:
+            return "Function not implemented yet.";
         }
     }
 
@@ -238,7 +239,7 @@ class FunctionExpression extends Expression {
      * Parse a function argument. This code pulls off the '(' and ')' around the
      * arguments passed to the function and parses them.
      */
-    static FunctionExpression parse(int ty, LexicalTokenizer lt) throws BASICSyntaxError {
+    static FunctionExpression parse(int ty, LexicalTokenizer lt) throws BasicSyntaxError {
         FunctionExpression result;
         Expression a;
         Expression b;
@@ -246,7 +247,7 @@ class FunctionExpression extends Expression {
         Token t;
 
         t = lt.nextToken();
-        if (! t.isSymbol('(')) {
+        if (!t.isSymbol('(')) {
             if (ty == RND) {
                 lt.unGetToken();
                 return new FunctionExpression(ty, new ConstantExpression(1));
@@ -254,103 +255,103 @@ class FunctionExpression extends Expression {
                 lt.unGetToken();
                 return new FunctionExpression(ty, new ConstantExpression(0));
             }
-            throw new BASICSyntaxError("Missing argument for function.");
+            throw new BasicSyntaxError("Missing argument for function.");
         }
         switch (ty) {
-            case RND:
-            case INT:
-            case SIN:
-            case COS:
-            case TAN:
-            case ATN:
-            case SQR:
-            case ABS:
-            case CHR:
-            case VAL:
-            case STR:
-            case SPC:
-            case TAB:
-            case LOG:
-                a = ParseExpression.expression(lt);
-                if (a instanceof BooleanExpression) {
-                    throw new BASICSyntaxError(functions[ty].toUpperCase()+" function cannot accept boolean expression.");
-                }
-                if ((ty == VAL) && (! a.isString()))
-                    throw new BASICSyntaxError(functions[ty].toUpperCase()+" requires a string valued argument.");
-                result = new FunctionExpression(ty, a);
-                break;
-            case MAX:
-            case MIN:
-                a = ParseExpression.expression(lt);
-                if (a instanceof BooleanExpression) {
-                    throw new BASICSyntaxError(functions[ty]+" function cannot accept boolean expression.");
-                }
-                t = lt.nextToken();
-                if (! t.isSymbol(','))
-                    throw new BASICSyntaxError(functions[ty]+" function expects two arguments.");
-                b = ParseExpression.expression(lt);
-                if (b instanceof BooleanExpression) {
-                    throw new BASICSyntaxError(functions[ty]+" function cannot accept boolean expression.");
-                }
-                result = new FunctionExpression(ty, a, b);
-                break;
-            case LEN:
-                a = ParseExpression.expression(lt);
-                if (! a.isString()) {
-                    throw new BASICSyntaxError(functions[ty]+
-                            " function expects a string argumnet.");
-                }
-                result = new FunctionExpression(ty, a);
-                break;
-            case LEFT:
-            case RIGHT:
-                se = ParseExpression.expression(lt);
-                if (! se.isString()) {
-                    throw new BASICSyntaxError(
-                            "Function expects a string expression.");
-                }
-                t = lt.nextToken();
-                if (! t.isSymbol(',')) {
-                    throw new BASICSyntaxError(functions[ty]+
-                            " function requires two arguments.");
-                }
-                a = ParseExpression.expression(lt);
-                result = new FunctionExpression(ty, a);
-                result.sVar = se;
-                break;
+        case RND:
+        case INT:
+        case SIN:
+        case COS:
+        case TAN:
+        case ATN:
+        case SQR:
+        case ABS:
+        case CHR:
+        case VAL:
+        case STR:
+        case SPC:
+        case TAB:
+        case LOG:
+            a = ParseExpression.expression(lt);
+            if (a instanceof BooleanExpression) {
+                throw new BasicSyntaxError(functions[ty].toUpperCase() + " function cannot accept boolean expression.");
+            }
+            if ((ty == VAL) && (!a.isString()))
+                throw new BasicSyntaxError(functions[ty].toUpperCase() + " requires a string valued argument.");
+            result = new FunctionExpression(ty, a);
+            break;
+        case MAX:
+        case MIN:
+            a = ParseExpression.expression(lt);
+            if (a instanceof BooleanExpression) {
+                throw new BasicSyntaxError(functions[ty] + " function cannot accept boolean expression.");
+            }
+            t = lt.nextToken();
+            if (!t.isSymbol(','))
+                throw new BasicSyntaxError(functions[ty] + " function expects two arguments.");
+            b = ParseExpression.expression(lt);
+            if (b instanceof BooleanExpression) {
+                throw new BasicSyntaxError(functions[ty] + " function cannot accept boolean expression.");
+            }
+            result = new FunctionExpression(ty, a, b);
+            break;
+        case LEN:
+            a = ParseExpression.expression(lt);
+            if (!a.isString()) {
+                throw new BasicSyntaxError(functions[ty] +
+                        " function expects a string argumnet.");
+            }
+            result = new FunctionExpression(ty, a);
+            break;
+        case LEFT:
+        case RIGHT:
+            se = ParseExpression.expression(lt);
+            if (!se.isString()) {
+                throw new BasicSyntaxError(
+                        "Function expects a string expression.");
+            }
+            t = lt.nextToken();
+            if (!t.isSymbol(',')) {
+                throw new BasicSyntaxError(functions[ty] +
+                        " function requires two arguments.");
+            }
+            a = ParseExpression.expression(lt);
+            result = new FunctionExpression(ty, a);
+            result.sVar = se;
+            break;
 
-            case MID:
-                se = ParseExpression.expression(lt);
-                if (! se.isString()) {
-                    throw new BASICSyntaxError(
-                            "Function expects a string expression.");
-                }
-                t = lt.nextToken();
-                if (! t.isSymbol(',')) {
-                    throw new BASICSyntaxError(functions[ty]+
-                            " function requires at least two arguments.");
-                }
-                a = ParseExpression.expression(lt);
-                t = lt.nextToken();
-                if (t.isSymbol(')')) {
-                    b = new ConstantExpression(1.0);
-                    lt.unGetToken();
-                } else if (t.isSymbol(',')) {
-                    b = ParseExpression.expression(lt);
-                } else {
-                    throw new BASICSyntaxError(functions[ty]+
+        case MID:
+            se = ParseExpression.expression(lt);
+            if (!se.isString()) {
+                throw new BasicSyntaxError(
+                        "Function expects a string expression.");
+            }
+            t = lt.nextToken();
+            if (!t.isSymbol(',')) {
+                throw new BasicSyntaxError(functions[ty] +
+                        " function requires at least two arguments.");
+            }
+            a = ParseExpression.expression(lt);
+            t = lt.nextToken();
+            if (t.isSymbol(')')) {
+                b = new ConstantExpression(1.0);
+                lt.unGetToken();
+            } else if (t.isSymbol(',')) {
+                b = ParseExpression.expression(lt);
+            } else {
+                throw new BasicSyntaxError(functions[ty] +
                         " unexpected symbol in expression.");
-                }
-                result = new FunctionExpression(ty, a, b);
-                result.sVar = se;
-                break;
-            default:
-                throw new BASICSyntaxError("Unknown function on input.");
+            }
+            result = new FunctionExpression(ty, a, b);
+            result.sVar = se;
+            break;
+        default:
+            throw new BasicSyntaxError("Unknown function on input.");
 
         }
         t = lt.nextToken();
-        if (! t.isSymbol(')')) {
-            throw new BASICSyntaxError("Missing closing parenthesis for function.");
+        if (!t.isSymbol(')')) {
+            throw new BasicSyntaxError("Missing closing parenthesis for function.");
         }
         return result;
     }

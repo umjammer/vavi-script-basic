@@ -21,8 +21,8 @@ package net.sf.cocoa.basic.statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.BooleanExpression;
 import net.sf.cocoa.basic.Expression;
 import net.sf.cocoa.basic.LexicalTokenizer;
@@ -66,13 +66,13 @@ public class IFStatement extends Statement {
     Expression nExp;
     Statement thenClause;
 
-    public IFStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public IFStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(IF);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         double v;
         Statement s;
 
@@ -84,21 +84,21 @@ public class IFStatement extends Statement {
                 s = pgm.getStatement(lineTarget);
                 if (s != null)
                     return s;
-                throw new BASICRuntimeError("Illegal line number following THEN.");
+                throw new BasicRuntimeError("Illegal line number following THEN.");
             }
         }
         return pgm.nextStatement(this);
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Statement qq;
 
         sb.append("IF ");
         sb.append(nExp.unparse());
         sb.append(" THEN ");
         if (thenClause == null) {
-            sb.append(lineTarget+"");
+            sb.append(lineTarget);
             return sb.toString();
         }
         for (qq = thenClause; qq != null; qq = qq.nxt) {
@@ -120,29 +120,29 @@ public class IFStatement extends Statement {
      * perhaps an arbitrary restriction, but part of the spec none-the-less.
      */
     @SuppressWarnings("unused")
-    private static void noBool(Expression a) throws BASICSyntaxError {
+    private static void noBool(Expression a) throws BasicSyntaxError {
         if (a instanceof BooleanExpression)
-            throw new BASICSyntaxError("Boolean expression not allowed here.");
+            throw new BasicSyntaxError("Boolean expression not allowed here.");
     }
 
     /**
      * Parse IF Statement.
      */
-    private static void parse(IFStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(IFStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         s.nExp = ParseExpression.expression(lt);
         if (!(s.nExp instanceof BooleanExpression))
-            throw new BASICSyntaxError("Boolean expression required for IF.");
+            throw new BasicSyntaxError("Boolean expression required for IF.");
         Token t = lt.nextToken();
         if (t.isSymbol(')')) {
-            throw new BASICSyntaxError("Mismatched parenthesis.");
+            throw new BasicSyntaxError("Mismatched parenthesis.");
         } else if ((t.typeNum() != Token.KEYWORD) || (t.numValue() != THEN)) {
-            throw new BASICSyntaxError("Missing THEN keyword in IF statement.");
+            throw new BasicSyntaxError("Missing THEN keyword in IF statement.");
         }
         t = lt.nextToken();
         if (t.typeNum() == Token.CONSTANT) {
             int li = (int) t.numValue();
             if (li <= 0) {
-                throw new BASICSyntaxError("Invalid line number following THEN.");
+                throw new BasicSyntaxError("Invalid line number following THEN.");
             }
             s.thenClause = null;
             s.lineTarget = (int) t.numValue();
@@ -152,7 +152,7 @@ public class IFStatement extends Statement {
         lt.unGetToken(); // put back this token.
         s.thenClause = ParseStatement.statement(lt);
         if (s.thenClause == null)
-            throw new BASICSyntaxError("Unparsable statement after THEN.");
+            throw new BasicSyntaxError("Unparsable statement after THEN.");
         return;
     }
 
@@ -167,6 +167,4 @@ public class IFStatement extends Statement {
         if (thenClause != null)
             thenClause.addLine(l);
     }
-
-
 }

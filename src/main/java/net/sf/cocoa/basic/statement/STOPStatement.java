@@ -18,12 +18,12 @@
 
 package net.sf.cocoa.basic.statement;
 
+import net.sf.cocoa.basic.BasicRuntimeError;
 import net.sf.cocoa.basic.Statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 
@@ -42,11 +42,11 @@ import net.sf.cocoa.basic.Program;
  */
 public class STOPStatement extends Statement {
 
-    public STOPStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public STOPStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(STOP);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         out.println("STOP at line : "+line);
         pgm.push(this);
         return null;
@@ -55,5 +55,4 @@ public class STOPStatement extends Statement {
     public String unparse() {
         return "STOP";
     }
-
 }

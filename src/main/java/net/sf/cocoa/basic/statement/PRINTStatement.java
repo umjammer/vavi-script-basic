@@ -23,8 +23,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.ParseExpression;
 import net.sf.cocoa.basic.PrintItem;
@@ -52,18 +52,17 @@ public class PRINTStatement extends Statement {
     // This is the line number to transfer control too.
     List<PrintItem> args;
 
-    public PRINTStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public PRINTStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(PRINT);
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         PrintItem pi = null;
         int col = 0;
-        for (int i = 0; i < args.size(); i++) {
-            String z;
-            pi = (PrintItem)(args.get(i));
-            z = pi.value(pgm, col);
+        for (PrintItem arg : args) {
+            pi = arg;
+            String z = pi.value(pgm, col);
             out.print(z);
             col += z.length();
         }
@@ -74,16 +73,15 @@ public class PRINTStatement extends Statement {
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("PRINT ");
-        for (int i = 0; i < args.size(); i++) {
-            PrintItem pi = (PrintItem)(args.get(i));
-            sb.append(pi.unparse());
+        for (PrintItem arg : args) {
+            sb.append(arg.unparse());
         }
         return sb.toString();
     }
 
-    private static List<PrintItem> parseStringExpression(LexicalTokenizer lt) throws BASICSyntaxError {
+    private static List<PrintItem> parseStringExpression(LexicalTokenizer lt) throws BasicSyntaxError {
         List<PrintItem> result = new ArrayList<>();
         Token t;
 
@@ -125,7 +123,7 @@ public class PRINTStatement extends Statement {
         }
     }
 
-    private static void parse(PRINTStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(PRINTStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         s.args = parseStringExpression(lt);
     }
 }

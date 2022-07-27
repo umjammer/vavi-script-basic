@@ -21,8 +21,8 @@ package net.sf.cocoa.basic.statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.BooleanExpression;
 import net.sf.cocoa.basic.Expression;
 import net.sf.cocoa.basic.LexicalTokenizer;
@@ -54,13 +54,13 @@ public class LETStatement extends Statement {
     Variable myVar;
     Expression nExp;
 
-    public LETStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public LETStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(LET);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         if (myVar.isString()) {
             pgm.setVariable(myVar, nExp.stringValue(pgm));
         } else {
@@ -70,12 +70,11 @@ public class LETStatement extends Statement {
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("LET ");
-        sb.append(myVar.unparse());
-        sb.append(" = ");
-        sb.append(nExp.unparse());
-        return sb.toString();
+        String sb = "LET " +
+                myVar.unparse() +
+                " = " +
+                nExp.unparse();
+        return sb;
     }
 
     /**
@@ -91,26 +90,26 @@ public class LETStatement extends Statement {
     /**
      * Parse LET Statement.
      */
-    private static void parse(LETStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(LETStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
 
         if (t.typeNum() != Token.VARIABLE)
-            throw new BASICSyntaxError("variable expected for LET statement.");
+            throw new BasicSyntaxError("variable expected for LET statement.");
 
         s.myVar = (Variable) t;
         t = lt.nextToken();
         if (! t.isOp(Expression.OP_EQ))
-            throw new BASICSyntaxError("missing = in assignment statement.");
+            throw new BasicSyntaxError("missing = in assignment statement.");
         s.nExp = ParseExpression.expression(lt);
         if (s.myVar.isString() && ! s.nExp.isString()) {
-            throw new BASICSyntaxError("String assignment needs string expression.");
+            throw new BasicSyntaxError("String assignment needs string expression.");
         }
         if (s.nExp instanceof BooleanExpression) {
-            throw new BASICSyntaxError("Boolean expression not allowed in LET.");
+            throw new BasicSyntaxError("Boolean expression not allowed in LET.");
         }
         t = lt.nextToken();
         if (t.isSymbol(')'))
-            throw new BASICSyntaxError("unmatched parenthesis in LET statement.");
+            throw new BasicSyntaxError("unmatched parenthesis in LET statement.");
         else
             lt.unGetToken();
         return;

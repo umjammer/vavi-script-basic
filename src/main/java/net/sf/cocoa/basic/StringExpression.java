@@ -20,11 +20,11 @@ package net.sf.cocoa.basic;
 
 class StringExpression extends Expression {
 
-    StringExpression(int op, Expression a, Expression b) throws BASICSyntaxError {
+    StringExpression(int op, Expression a, Expression b) throws BasicSyntaxError {
         super(op, a, b);
     }
 
-    public double value(Program pgm) throws BASICRuntimeError {
+    public double value(Program pgm) throws BasicRuntimeError {
         switch (oper) {
             case OP_EQ:
                 return (arg1.stringValue(pgm).compareTo(arg2.stringValue(pgm)) == 0) ? 1 : 0;
@@ -43,18 +43,18 @@ class StringExpression extends Expression {
         }
     }
 
-    String stringValue(Program pgm, int c)  throws BASICRuntimeError {
+    String stringValue(Program pgm, int c)  throws BasicRuntimeError {
         switch (oper) {
             case OP_ADD:
                 String z = arg1.stringValue(pgm, c);
                 int c2 = c + z.length();
                 return z + arg2.stringValue(pgm, c2);
             default:
-                throw new BASICRuntimeError("Unknown operator in string expression.");
+                throw new BasicRuntimeError("Unknown operator in string expression.");
         }
     }
 
-    public String stringValue(Program pgm) throws BASICRuntimeError {
+    public String stringValue(Program pgm) throws BasicRuntimeError {
         return stringValue(pgm, 0);
     }
 

@@ -25,15 +25,15 @@ package net.sf.cocoa.basic;
  */
 public class BooleanExpression extends Expression {
 
-    BooleanExpression(int t, Expression a, Expression b) throws BASICSyntaxError {
+    BooleanExpression(int t, Expression a, Expression b) throws BasicSyntaxError {
         super(t, a, b);
     }
 
-    BooleanExpression(int t, Expression a) throws BASICSyntaxError {
+    BooleanExpression(int t, Expression a) throws BasicSyntaxError {
         super(t, a);
     }
 
-    public double value(Program pgm) throws BASICRuntimeError {
+    public double value(Program pgm) throws BasicRuntimeError {
         if (! (arg1.isString() || arg2.isString()))
             return super.value(pgm);
 
@@ -54,6 +54,5 @@ public class BooleanExpression extends Expression {
                 return super.value(pgm);
         }
     }
-
 }
 

@@ -23,8 +23,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.BooleanExpression;
 import net.sf.cocoa.basic.Expression;
 import net.sf.cocoa.basic.LexicalTokenizer;
@@ -63,13 +63,13 @@ public class ONStatement extends Statement {
     Expression nExp;
     List<Token> args;
 
-    public ONStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public ONStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(ON_GOTO);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         Statement s;
 
         int select = (int) nExp.value(pgm);
@@ -79,21 +79,21 @@ public class ONStatement extends Statement {
         Token z = args.get(select);
         s = pgm.getStatement((int) z.numValue());
         if (s == null)
-            throw new BASICRuntimeError("ON "+keywords[keyword]+" has illegal line target.");
+            throw new BasicRuntimeError("ON "+keywords[keyword]+" has illegal line target.");
         if (keyword == ON_GOSUB)
             pgm.push(this);
         return s;
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("ON ");
-        sb.append(nExp.unparse()+" ");
-        sb.append(keywords[keyword].toUpperCase()+" ");
+        sb.append(nExp.unparse()).append(" ");
+        sb.append(keywords[keyword].toUpperCase()).append(" ");
         for (int i = 0; i < args.size(); i++) {
-            Token t = (Token)(args.get(i));
+            Token t = args.get(i);
             if (i < (args.size()-1))
-                sb.append(t.unparse()+", ");
+                sb.append(t.unparse()).append(", ");
             else
                 sb.append(t.unparse());
         }
@@ -109,17 +109,17 @@ public class ONStatement extends Statement {
     /**
      * Parse ON Statement.
      */
-    private static void parse(ONStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(ONStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t;
 
         s.nExp = ParseExpression.expression(lt);
         if (s.nExp.isString() || (s.nExp instanceof BooleanExpression)) {
-            throw new BASICSyntaxError("Numeric expression required here.");
+            throw new BasicSyntaxError("Numeric expression required here.");
         }
         t = lt.nextToken();
         if ((t.typeNum() != Token.KEYWORD) ||
             ((t.numValue() != GOTO) && (t.numValue() != GOSUB))) {
-            throw new BASICSyntaxError("On statement needs GOTO or GOSUB.");
+            throw new BasicSyntaxError("On statement needs GOTO or GOSUB.");
         }
 
         // Check our assumption about the GOTOness of the statement.
@@ -137,7 +137,7 @@ public class ONStatement extends Statement {
             if (t.typeNum() == Token.EOL)
                 break;
             if (! t.isSymbol(',')) {
-                throw new BASICSyntaxError("LINE numbers should be separated by commas.");
+                throw new BasicSyntaxError("LINE numbers should be separated by commas.");
             }
         }
         lt.unGetToken(); // back up the tokenizer;

@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -35,26 +37,27 @@ import java.util.Stack;
 
 import net.sf.cocoa.util.RedBlackTree;
 
+
 /**
  * This class instantiates a BASIC program. A valid program is one that is
  * parsed and ready to run. You can run it by invoking the run() method.
  * The standard input and output of the running basic program can either
  * be passed into the <b>run</b> method, or they can be presumed to be the
  * in and out streams referenced by the <b>System</b> class.
- *
+ * <p>
  * This class uses Red-Black trees to hold the parsed statements and the
  * symbol table.
  *
- * @author      Chuck McManis
- * @version     1.1
- * @see         CommandInterpreter
- *
+ * @author Chuck McManis
+ * @version 1.1
+ * @see CommandInterpreter
  */
 public class Program implements Runnable {
-    // this tree holds all of the statements.
+
+    /** this tree holds all of the statements. */
     private RedBlackTree<Statement> stmts = new RedBlackTree<>(new NumberCompare());
 
-    // this tree holds all of the variables.
+    /** this tree holds all of the variables. */
     private RedBlackTree<Variable> vars = new RedBlackTree<>();
 
     private Stack<Statement> stmtStack = new Stack<>();
@@ -67,12 +70,14 @@ public class Program implements Runnable {
     boolean traceState = false;
     PrintStream traceFile = null;
 
-    public void trace(boolean a) { traceState = a; }
+    public void trace(boolean a) {
+        traceState = a;
+    }
 
     public void trace(boolean a, String f) {
         if (traceFile == null) {
             try {
-                traceFile = new PrintStream(new FileOutputStream(f));
+                traceFile = new PrintStream(Files.newOutputStream(Paths.get(f)));
             } catch (IOException e) {
                 System.out.println("Couldn't open trace file.");
                 traceFile = null;
@@ -98,9 +103,9 @@ public class Program implements Runnable {
      * an already open stream or you can pass in a file name and load one from
      * the file system.
      */
-    public static Program load(InputStream source, PrintStream out) throws IOException, BASICSyntaxError {
+    public static Program load(InputStream source, PrintStream out) throws IOException, BasicSyntaxError {
         BufferedReader dis = new BufferedReader(new InputStreamReader(new BufferedInputStream(source)));
-        char data[] = new char[256];
+        char[] data = new char[256];
         LexicalTokenizer lt = new LexicalTokenizer(data);
         String lineData;
         Statement s;
@@ -122,13 +127,13 @@ public class Program implements Runnable {
             lt.reset(lineData);
             t = lt.nextToken();
             if (t.typeNum() != Token.CONSTANT) {
-                throw new BASICSyntaxError("Line failed to start with a line number.");
+                throw new BasicSyntaxError("Line failed to start with a line number.");
             }
 
             try {
                 s = ParseStatement.statement(lt);
-            } catch (BASICSyntaxError bse) {
-                out.println("Syntax error: "+bse.getMsg());
+            } catch (BasicSyntaxError bse) {
+                out.println("Syntax error: " + bse.getMsg());
                 out.println(lt.showError());
                 throw bse;
             }
@@ -140,17 +145,18 @@ public class Program implements Runnable {
 
     /**
      * Load the specified file and parse the basic statements it contains.
-     * @throws IOException when the filename cannot be located or opened.
-     * @throws BASICSyntaxError when the file does not contain a properly formed
-     *          BASIC program.
+     *
+     * @throws IOException      when the filename cannot be located or opened.
+     * @throws BasicSyntaxError when the file does not contain a properly formed
+     *                          BASIC program.
      */
-    public static Program load(String source, PrintStream out) throws IOException, BASICSyntaxError {
+    public static Program load(String source, PrintStream out) throws IOException, BasicSyntaxError {
         // XXX this needs to use the SourceManager class //
         FileInputStream fis = new FileInputStream(source);
         Program r = null;
         try {
             r = load(fis, out);
-        } catch (BASICSyntaxError e) {
+        } catch (BasicSyntaxError e) {
             fis.close();
             throw e;
         }
@@ -193,7 +199,7 @@ public class Program implements Runnable {
      * returns false.
      */
     boolean add(int line, Statement s) {
-        Integer ln = new Integer(line);
+        Integer ln = line;
         stmts.put(ln, s);
         return true;
     }
@@ -204,19 +210,17 @@ public class Program implements Runnable {
      * exist, then this method returns false.
      */
     boolean del(int line) {
-        if (stmts.remove(line) == null)
-            return false;
-        return true;
+        return stmts.remove(line) != null;
     }
 
     /**
      * Compute the indices based on the expressions in the variable
      * object.
      */
-    private int[] getIndices(Variable v) throws BASICRuntimeError {
-        int result[] = new int[v.numExpn()];
+    private int[] getIndices(Variable v) throws BasicRuntimeError {
+        int[] result = new int[v.numExpn()];
 
-        for (int i=0; i < result.length; i++) {
+        for (int i = 0; i < result.length; i++) {
             result[i] = (int) v.expn(i).value(this);
         }
         return result;
@@ -224,17 +228,17 @@ public class Program implements Runnable {
 
     /**
      * Return the numeric value of a variable in the symbol table.
-     * @throws BASICRuntimeError if the variable isn't defined.
      *
+     * @throws BasicRuntimeError if the variable isn't defined.
      */
-    public double getVariable(Variable v) throws BASICRuntimeError {
-        Variable vi = (Variable) vars.get(v.name);
+    public double getVariable(Variable v) throws BasicRuntimeError {
+        Variable vi = vars.get(v.name);
         if (vi == null) {
-            throw new BASICRuntimeError("Undefined variable '"+v.name+"'");
+            throw new BasicRuntimeError("Undefined variable '" + v.name + "'");
         }
-        if (! vi.isArray())
+        if (!vi.isArray())
             return vi.numValue();
-        int ii[] = getIndices(v);
+        int[] ii = getIndices(v);
         return vi.numValue(ii);
     }
 
@@ -243,13 +247,13 @@ public class Program implements Runnable {
      * the variable has not yet been declared (ie used) this method throws
      * a BASICRuntime error.
      */
-    String getString(Variable v) throws BASICRuntimeError {
-        Variable vi = (Variable) vars.get(v.name);
+    String getString(Variable v) throws BasicRuntimeError {
+        Variable vi = vars.get(v.name);
         if (vi == null)
-            throw new BASICRuntimeError("Variable "+v.name+" has not been initialized.");
-        if (! v.isArray())
+            throw new BasicRuntimeError("Variable " + v.name + " has not been initialized.");
+        if (!v.isArray())
             return vi.stringValue();
-        int ii[] = getIndices(v);
+        int[] ii = getIndices(v);
         return vi.stringValue(ii);
     }
 
@@ -258,19 +262,19 @@ public class Program implements Runnable {
      * this is the first time we have seen the variable, create a place for
      * it in the symbol table.
      */
-    public void setVariable(Variable myVar, double value) throws BASICRuntimeError {
-        Variable vi = (Variable) vars.get(myVar.name);
+    public void setVariable(Variable myVar, double value) throws BasicRuntimeError {
+        Variable vi = vars.get(myVar.name);
         if (vi == null) {
             if (myVar.isArray())
-                throw new BASICRuntimeError("Array must be declared in a DIM statement");
+                throw new BasicRuntimeError("Array must be declared in a DIM statement");
             vi = new Variable(myVar.name);
             vars.put(myVar.name, vi);
         }
-        if (! vi.isArray()) {
+        if (!vi.isArray()) {
             vi.setValue(value);
             return;
         }
-        int ii[] = getIndices(myVar);
+        int[] ii = getIndices(myVar);
         vi.setValue(value, ii);
     }
 
@@ -281,19 +285,19 @@ public class Program implements Runnable {
      * Set the string variable named <i>name</i> to have the value <i>value</i>.
      * If this is the first use of the variable it is created.
      */
-    public void setVariable(Variable v, String value) throws BASICRuntimeError {
+    public void setVariable(Variable v, String value) throws BasicRuntimeError {
         Variable vi = vars.get(v.name);
         if (vi == null) {
             if (v.isArray())
-                throw new BASICRuntimeError("Array must be declared in a DIM statement");
+                throw new BasicRuntimeError("Array must be declared in a DIM statement");
             vi = new Variable(v.name);
             vars.put(v.name, vi);
         }
-        if (! vi.isArray()) {
+        if (!vi.isArray()) {
             vi.setValue(value);
             return;
         }
-        int ii[] = getIndices(v);
+        int[] ii = getIndices(v);
         vi.setValue(value, ii);
     }
 
@@ -302,9 +306,9 @@ public class Program implements Runnable {
      * the nature of arrays we force them to be declared before they can
      * be used. This is common to most BASIC implementations.
      */
-    public void declareArray(Variable v) throws BASICRuntimeError {
+    public void declareArray(Variable v) throws BasicRuntimeError {
         Variable vi;
-        int ii[] = getIndices(v);
+        int[] ii = getIndices(v);
         vi = new Variable(v.name, ii);
         vars.put(v.name, vi);
     }
@@ -321,7 +325,7 @@ public class Program implements Runnable {
         } else if (s.nxt != null) {
             return s.nxt;
         }
-        return ((Statement) stmts.next(new Integer(s.line)));
+        return ((Statement) stmts.next(s.line));
     }
 
 
@@ -329,7 +333,7 @@ public class Program implements Runnable {
      * Return the statment whose line number is <i>line</i>
      */
     public Statement getStatement(int line) {
-        Statement s = (Statement) stmts.get(new Integer(line));
+        Statement s = stmts.get(line);
         return s;
     }
 
@@ -341,7 +345,7 @@ public class Program implements Runnable {
      */
     void list(int start, int end, PrintStream p) {
         for (Enumeration<Statement> e = stmts.elements(); e.hasMoreElements(); ) {
-            Statement s = (Statement) e.nextElement();
+            Statement s = e.nextElement();
             if ((s.lineNo() >= start) && (s.lineNo() <= end)) {
                 p.print(s.asString());
                 p.print("\r");
@@ -356,7 +360,7 @@ public class Program implements Runnable {
     void dump(PrintStream p) {
         for (Enumeration<Variable> e = vars.elements(); e.hasMoreElements(); ) {
             Variable v = (Variable) e.nextElement();
-            p.println(v.unparse()+" = "+(v.isString() ? "\""+v.stringValue()+"\"" : ""+v.numValue()));
+            p.println(v.unparse() + " = " + (v.isString() ? "\"" + v.stringValue() + "\"" : "" + v.numValue()));
         }
     }
 
@@ -385,13 +389,13 @@ public class Program implements Runnable {
 
     /**
      * Run the program and use the passed in streams as its input and output streams.
-     *
+     * <p>
      * Prior to running the program the statement stack is cleared, and the data fifo
      * is also cleared. Thus re-running a stopped program will always work correctly.
      *
-     * @throws BASICRuntimeError if an error occurs while running.
+     * @throws BasicRuntimeError if an error occurs while running.
      */
-    public void run(InputStream in, OutputStream out) throws BASICRuntimeError {
+    public void run(InputStream in, OutputStream out) throws BasicRuntimeError {
         PrintStream pout;
         Enumeration<Statement> e = stmts.elements();
         stmtStack = new Stack<>();    // assume no stacked statements ...
@@ -402,7 +406,7 @@ public class Program implements Runnable {
         vars = new RedBlackTree<>();
 
         // if the program isn't yet valid.
-        if (! e.hasMoreElements())
+        if (!e.hasMoreElements())
             return;
 
         if (out instanceof PrintStream) {
@@ -413,14 +417,14 @@ public class Program implements Runnable {
 
         /* First we load all of the data statements */
         while (e.hasMoreElements()) {
-            s = (Statement) e.nextElement();
+            s = e.nextElement();
             if (s.keyword == Statement.DATA) {
                 s.execute(this, in, pout);
             }
         }
 
         e = stmts.elements();
-        s = (Statement) e.nextElement();
+        s = e.nextElement();
         do {
             int yyy;
 
@@ -431,7 +435,7 @@ public class Program implements Runnable {
                 yyy = 0;
             }
             if (yyy != 0) {
-                pout.println("Stopped at :"+s);
+                pout.println("Stopped at :" + s);
                 push(s);
                 break;
             }
@@ -455,16 +459,16 @@ public class Program implements Runnable {
      * exectution will start at that statement. This can be useful for debugging
      * but unpredictable since not all variables will be declared if their assignment
      * statements have not yet been executed.
-     *
+     * <p>
      * Unlike its sibling method above, it does NOT clear the statement stack or
      * data FIFO. This is so the command interpreter can debug stopped programs
      * using the immediate execution feature.
      */
-    void run(Statement s, InputStream in, OutputStream out) throws BASICRuntimeError {
+    void run(Statement s, InputStream in, OutputStream out) throws BasicRuntimeError {
         // if the program isn't yet valid.
         PrintStream pout;
         Enumeration<Statement> e = stmts.elements();
-        if (! e.hasMoreElements())
+        if (!e.hasMoreElements())
             return;
 
         if (out instanceof PrintStream) {
@@ -481,29 +485,29 @@ public class Program implements Runnable {
     /**
      * This final version of run is used to implement the <b>Runnable</b> interface.
      * It will run the program using System.in and System.out as the standard I/O
-     * streams for the program and it does *NOT* throw BASICRuntimeError. Instead
+     * streams for the program and it does *NOT* throw BasicRuntimeError. Instead
      * it catches it and prints an error message to standard out.
      */
     public void run() {
         try {
             run(System.in, System.out);
-        } catch (BASICRuntimeError e) {
-            System.out.println("Error Running program: "+e.getMsg());
+        } catch (BasicRuntimeError e) {
+            System.out.println("Error Running program: " + e.getMsg());
         }
     }
 
     /**
      * This method resumes a program that has been stopped. If the program
-     * wasn't really stopped it throws a BASICRuntimeError.
+     * wasn't really stopped it throws a BasicRuntimeError.
      *
-     * @throws BASICRuntimeError - Program wasn't in a stopped state.
+     * @throws BasicRuntimeError - Program wasn't in a stopped state.
      */
-    void resume(InputStream in, PrintStream pout) throws BASICRuntimeError {
+    void resume(InputStream in, PrintStream pout) throws BasicRuntimeError {
         Statement s;
 
         s = pop();
         if ((s == null) || (s.keyword != Statement.STOP)) {
-            throw new BASICRuntimeError("This program was not previously stopped.");
+            throw new BasicRuntimeError("This program was not previously stopped.");
         }
         s = nextStatement(s);
         do {
@@ -511,7 +515,8 @@ public class Program implements Runnable {
         } while (s != null);
     }
 
-    void cont(InputStream in, PrintStream pout) throws BASICRuntimeError {
+    /**  */
+    void cont(InputStream in, PrintStream pout) throws BasicRuntimeError {
         Statement s;
         int yyy;
 
@@ -524,7 +529,7 @@ public class Program implements Runnable {
                 yyy = 0;
             }
             if (yyy != 0) {
-                pout.println("Stopped at :"+s);
+                pout.println("Stopped at :" + s);
                 push(s);
                 break;
             }
@@ -538,7 +543,6 @@ public class Program implements Runnable {
                 s = nextStatement(s);
         } while (s != null);
     }
-
 
     /*
      * These methods deal with pushing and popping statements from the statement
@@ -559,7 +563,7 @@ public class Program implements Runnable {
     public Statement pop() {
         if (stmtStack.isEmpty())
             return null;
-        return (Statement) stmtStack.pop();
+        return stmtStack.pop();
     }
 
     /**
@@ -576,13 +580,13 @@ public class Program implements Runnable {
     public Token popData() {
         if (dataPtr > (dataStore.size() - 1))
             return null;
-        return (Token) dataStore.get(dataPtr++);
+        return dataStore.get(dataPtr++);
     }
 
     /**
      * Reset the data FIFO back to the beginning.
      */
-     public void resetData() {
+    public void resetData() {
         dataPtr = 0;
-     }
+    }
 }

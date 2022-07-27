@@ -1,0 +1,39 @@
+/*
+ * BasicSyntaxError.java
+ *
+ * Copyright (c) 1996 Chuck McManis, All Rights Reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software
+ * and its documentation for NON-COMMERCIAL purposes and without
+ * fee is hereby granted provided that this copyright notice
+ * appears in all copies.
+ *
+ * CHUCK MCMANIS MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE
+ * SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. CHUCK MCMANIS
+ * SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT
+ * OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+ */
+package net.sf.cocoa.basic;
+
+/**
+ * Thrown by the parser if it can't parse an input line.
+ */
+public class BasicSyntaxError extends BasicError {
+    /**
+     * A Syntax error with message <i>errorMessage</i>
+     */
+    public BasicSyntaxError(String errorMessage) {
+        super(errorMessage);
+    }
+
+    BasicSyntaxError(Statement thisStatement, String errorMessage) {
+        super(thisStatement, errorMessage);
+    }
+
+    /**
+     * Return the syntax error message.
+     */
+    public String getMsg() { return "Syntax Error : "+super.getMsg(); }
+}

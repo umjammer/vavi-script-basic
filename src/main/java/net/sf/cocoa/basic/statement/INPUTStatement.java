@@ -26,8 +26,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 import net.sf.cocoa.basic.Statement;
@@ -64,7 +64,7 @@ public class INPUTStatement extends Statement {
     /**
      * Construct a new INPUT statement object.
      */
-    public INPUTStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public INPUTStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(INPUT);
         parse(this, lt);
     }
@@ -72,7 +72,7 @@ public class INPUTStatement extends Statement {
     /**
      * Execute the INPUT statement. Most of the work is done in fillArgs.
      */
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         BufferedReader dis = new BufferedReader(new InputStreamReader(in));
         getMoreData(dis, out, prompt);
         fillArgs(dis, out, prompt, pgm, args);
@@ -83,15 +83,15 @@ public class INPUTStatement extends Statement {
      * Reconstruct this statement from its parsed data.
      */
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("INPUT ");
         if (prompt != null) {
-            sb.append("\""+prompt+"\"; ");
+            sb.append("\"").append(prompt).append("\"; ");
         }
         for (int i = 0; i < args.size(); i++) {
             Variable va = (Variable) args.get(i);
             if (i < (args.size() - 1)) {
-                sb.append(va.unparse()+", ");
+                sb.append(va.unparse()).append(", ");
             } else {
                 sb.append(va.unparse());
             }
@@ -103,9 +103,9 @@ public class INPUTStatement extends Statement {
      * This is our buffer for processing INPUT statement requests.
      */
     private int currentPos= 500;
-    private char buffer[] = new char[256];
+    private final char[] buffer = new char[256];
 
-    void getMoreData(BufferedReader in, PrintStream out, String prompt) throws BASICRuntimeError {
+    void getMoreData(BufferedReader in, PrintStream out, String prompt) throws BasicRuntimeError {
         String x = null;
 
         if (prompt != null) {
@@ -119,10 +119,10 @@ public class INPUTStatement extends Statement {
         try {
             x = in.readLine();
         } catch (IOException ioe) {
-            throw new BASICRuntimeError(this, "I/O error on input.");
+            throw new BasicRuntimeError(this, "I/O error on input.");
         }
         if (x == null)
-            throw new BASICRuntimeError(this, "Out of data for INPUT.");
+            throw new BasicRuntimeError(this, "Out of data for INPUT.");
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = (x.length() > i) ? x.charAt(i) : 0;
         }
@@ -133,7 +133,7 @@ public class INPUTStatement extends Statement {
     /*
      * Read a floating point number from the character buffer array.
      */
-    double getNumber(BufferedReader in, PrintStream out, String prompt) throws BASICRuntimeError {
+    double getNumber(BufferedReader in, PrintStream out, String prompt) throws BasicRuntimeError {
         double m = 0;   // Mantissa
         double f = 0;   // Fractional component
         int oldPos = currentPos; // save our place.
@@ -170,7 +170,7 @@ public class INPUTStatement extends Statement {
                 t = t/10.0;
             }
         } else if (currentPos == oldPos) // no number found
-            throw new BASICRuntimeError(this, "Number expected.");
+            throw new BasicRuntimeError(this, "Number expected.");
 
         m = (m + f) * ((wasNeg) ? -1 : 1);
         // so it was a number, perhaps we are done with it.
@@ -199,7 +199,7 @@ public class INPUTStatement extends Statement {
         try {
             e = Math.pow(10, (double)p);
         } catch (ArithmeticException zzz) {
-            throw new BASICRuntimeError(this, "Illegal numeric constant.");
+            throw new BasicRuntimeError(this, "Illegal numeric constant.");
         }
 
         if (wasNeg)
@@ -207,8 +207,8 @@ public class INPUTStatement extends Statement {
         return m * e;
     }
 
-    String getString(BufferedReader in, PrintStream out, String prompt) throws BASICRuntimeError {
-        StringBuffer sb = new StringBuffer();
+    String getString(BufferedReader in, PrintStream out, String prompt) throws BasicRuntimeError {
+        StringBuilder sb = new StringBuilder();
 
         if (currentPos >= buffer.length)
             getMoreData(in, out, prompt);
@@ -254,11 +254,11 @@ public class INPUTStatement extends Statement {
         }
     }
 
-    void fillArgs(BufferedReader in, PrintStream out, String prompt, Program pgm, List<Token> v) throws BASICRuntimeError {
-        for (int i = 0; i < v.size(); i++) {
-            Variable vi = (Variable) v.get(i);
+    void fillArgs(BufferedReader in, PrintStream out, String prompt, Program pgm, List<Token> v) throws BasicRuntimeError {
+        for (Token token : v) {
+            Variable vi = (Variable) token;
             if (buffer[currentPos] == '\n')
-                getMoreData(in, out, "(more)"+((prompt == null) ? "?" : prompt));
+                getMoreData(in, out, "(more)" + ((prompt == null) ? "?" : prompt));
             if (!vi.isString()) {
                 pgm.setVariable(vi, getNumber(in, out, prompt));
             } else {
@@ -278,7 +278,7 @@ public class INPUTStatement extends Statement {
                     currentPos++;
                     continue;
                 }
-                throw new BASICRuntimeError(this, "Comma expected, got '"+buffer[currentPos]+"'.");
+                throw new BasicRuntimeError(this, "Comma expected, got '" + buffer[currentPos] + "'.");
             }
         }
     }
@@ -286,7 +286,7 @@ public class INPUTStatement extends Statement {
     /**
      * Parse INPUT Statement.
      */
-    private static void parse(INPUTStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(INPUTStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t;
         boolean needComma = false;
         s.args = new ArrayList<>();
@@ -297,7 +297,7 @@ public class INPUTStatement extends Statement {
             s.prompt = t.stringValue();
             t = lt.nextToken();
             if (! t.isSymbol(';'))
-                throw new BASICSyntaxError("semi-colon expected after prompt string.");
+                throw new BasicSyntaxError("semi-colon expected after prompt string.");
         } else {
             lt.unGetToken();
         }
@@ -318,7 +318,7 @@ public class INPUTStatement extends Statement {
             if (t.typeNum() == Token.VARIABLE) {
                 s.args.add(t);
             } else {
-                throw new BASICSyntaxError("malformed INPUT statement.");
+                throw new BasicSyntaxError("malformed INPUT statement.");
             }
             needComma = true;
         }

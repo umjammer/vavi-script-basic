@@ -18,12 +18,12 @@
 
 package net.sf.cocoa.basic.statement;
 
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.Statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
 import net.sf.cocoa.basic.Expression;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.ParseExpression;
@@ -40,7 +40,7 @@ public class RANDOMIZEStatement extends Statement {
     Expression nExpn;
     boolean useTimeOfDay = false;
 
-    public RANDOMIZEStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public RANDOMIZEStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(RANDOMIZE);
         Token t = lt.nextToken();
         switch (t.typeNum()) {
@@ -51,14 +51,14 @@ public class RANDOMIZEStatement extends Statement {
                 nExpn = ParseExpression.expression(lt);
             case Token.KEYWORD:
                 if (t.numValue() != TIMER)
-                    throw new BASICSyntaxError("Badly formed randomize statement.");
+                    throw new BasicSyntaxError("Badly formed randomize statement.");
                 useTimeOfDay = true;
             default:
                 lt.unGetToken();
         }
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         if (nExpn != null) {
             pgm.randomize(nExpn.value(pgm));
         } else {
@@ -72,5 +72,4 @@ public class RANDOMIZEStatement extends Statement {
             return "RANDOMIZE "+nExpn.unparse();
         return "RANDOMIZE";
     }
-
 }

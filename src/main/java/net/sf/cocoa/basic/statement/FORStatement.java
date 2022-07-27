@@ -21,8 +21,8 @@ package net.sf.cocoa.basic.statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.BooleanExpression;
 import net.sf.cocoa.basic.ConstantExpression;
 import net.sf.cocoa.basic.Expression;
@@ -69,20 +69,20 @@ public class FORStatement extends Statement {
     Expression sExp;
     Variable myVar;
 
-    public FORStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public FORStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(FOR);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         pgm.setVariable(myVar, nExp.value(pgm));
         pgm.push(this);
         return pgm.nextStatement(this);
     }
 
     public String unparse() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("FOR ");
         sb.append(myVar.unparse());
         sb.append(" = ");
@@ -115,26 +115,26 @@ public class FORStatement extends Statement {
     /**
      * Parse FOR Statement.
      */
-    private static void parse(FORStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(FORStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
 
         if (t.typeNum() != Token.VARIABLE) {
-            throw new BASICSyntaxError("Missing variable in FOR statement");
+            throw new BasicSyntaxError("Missing variable in FOR statement");
         }
 
         s.myVar = (Variable) t;
         if (s.myVar.isString())
-            throw new BASICSyntaxError("Numeric variable required for FOR statement.");
+            throw new BasicSyntaxError("Numeric variable required for FOR statement.");
 
         t = lt.nextToken();
         if (! t.isOp(Expression.OP_EQ)) {
-            throw new BASICSyntaxError("Missing = in FOR statement");
+            throw new BasicSyntaxError("Missing = in FOR statement");
         }
         s.nExp = ParseExpression.expression(lt);
         noBool(s.nExp);
         t = lt.nextToken();
         if ((t.typeNum() != Token.KEYWORD) || (t.numValue() != TO)) {
-            throw new BASICSyntaxError("Missing TO in FOR statement.");
+            throw new BasicSyntaxError("Missing TO in FOR statement.");
         }
         s.eExp = ParseExpression.expression(lt);
         noBool(s.eExp);

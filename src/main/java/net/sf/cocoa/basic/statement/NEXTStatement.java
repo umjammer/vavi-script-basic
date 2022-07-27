@@ -21,8 +21,8 @@ package net.sf.cocoa.basic.statement;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.sf.cocoa.basic.BASICRuntimeError;
-import net.sf.cocoa.basic.BASICSyntaxError;
+import net.sf.cocoa.basic.BasicRuntimeError;
+import net.sf.cocoa.basic.BasicSyntaxError;
 import net.sf.cocoa.basic.LexicalTokenizer;
 import net.sf.cocoa.basic.Program;
 import net.sf.cocoa.basic.Statement;
@@ -50,13 +50,13 @@ public class NEXTStatement extends Statement {
     // This is the line number to transfer control too.
     Variable myVar;
 
-    public NEXTStatement(LexicalTokenizer lt) throws BASICSyntaxError {
+    public NEXTStatement(LexicalTokenizer lt) throws BasicSyntaxError {
         super(NEXT);
 
         parse(this, lt);
     }
 
-    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BASICRuntimeError {
+    protected Statement doit(Program pgm, InputStream in, PrintStream out) throws BasicRuntimeError {
         Statement xs;
         FORStatement s;
 
@@ -66,11 +66,11 @@ public class NEXTStatement extends Statement {
         while (true) {
             xs = pgm.pop();
             if (xs == null) {
-                throw new BASICRuntimeError("NEXT without FOR");
+                throw new BasicRuntimeError("NEXT without FOR");
             }
 
             if (! (xs instanceof FORStatement)) {
-                throw new BASICRuntimeError("Bogus intervening statement: "+xs.asString());
+                throw new BasicRuntimeError("Bogus intervening statement: "+xs.asString());
             }
             s = (FORStatement) xs;
             /*
@@ -86,14 +86,14 @@ public class NEXTStatement extends Statement {
                 break;
             /*
             if (! (s.myVar.name.equalsIgnoreCase(myVar.name))) {
-                throw new BASICRuntimeError("NEXT was expecting FOR "+myVar.name+
+                throw new BasicRuntimeError("NEXT was expecting FOR "+myVar.name+
                             " = ..., not variable '"+s.myVar.name+"'");
             }
             */
         }
         double stepValue = s.sExp.value(pgm);
         if (stepValue == 0)
-            throw new BASICRuntimeError("step value of 0.0 in for loop.");
+            throw new BasicRuntimeError("step value of 0.0 in for loop.");
         pgm.setVariable(myVar, pgm.getVariable(myVar)+s.sExp.value(pgm));
 
         double endValue = s.eExp.value(pgm);
@@ -115,7 +115,6 @@ public class NEXTStatement extends Statement {
                 return pgm.nextStatement(s);
             }
         }
-
     }
 
     public String unparse() {
@@ -131,7 +130,7 @@ public class NEXTStatement extends Statement {
     /**
      * Parse NEXT Statement.
      */
-    private static void parse(NEXTStatement s, LexicalTokenizer lt) throws BASICSyntaxError {
+    private static void parse(NEXTStatement s, LexicalTokenizer lt) throws BasicSyntaxError {
         Token t = lt.nextToken();
         /*
          * Do NEXT statements *require* a variable? In many BASIC implementations
@@ -140,10 +139,9 @@ public class NEXTStatement extends Statement {
         if (t.typeNum() != Token.VARIABLE) {
             lt.unGetToken();
             return;
-//          throw new BASICSyntaxError("NEXT requires a variable");
+//          throw new BasicSyntaxError("NEXT requires a variable");
         }
         s.myVar = (Variable) t;
         return;
     }
-
 }

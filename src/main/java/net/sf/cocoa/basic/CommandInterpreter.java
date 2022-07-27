@@ -26,9 +26,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 
 import vavi.util.Debug;
+
 
 /**
  * This class is an "interactive" BASIC environment. You can think of it as
@@ -41,15 +44,15 @@ public class CommandInterpreter {
     private PrintStream outStream;
 
     static final String commands[] = {
-        "new", "run",  "list", "cat", "del", "resume",
-        "bye", "save", "load", "dump", "cont",
+            "new", "run", "list", "cat", "del", "resume",
+            "bye", "save", "load", "dump", "cont",
     };
 
-    static final int CMD_NEW =  0;
-    static final int CMD_RUN =  1;
+    static final int CMD_NEW = 0;
+    static final int CMD_RUN = 1;
     static final int CMD_LIST = 2;
-    static final int CMD_CAT =  3;
-    static final int CMD_DEL =  4;
+    static final int CMD_CAT = 3;
+    static final int CMD_DEL = 4;
     static final int CMD_RESUME = 5;
     static final int CMD_BYE = 6;
     static final int CMD_SAVE = 7;
@@ -57,15 +60,28 @@ public class CommandInterpreter {
     static final int CMD_DUMP = 9;
     static final int CMD_CONT = 10;
 
+    /** */
+    public CommandInterpreter() {}
+
     /**
      * Create a new command interpreter attached to the passed
      * in streams.
      */
     public CommandInterpreter(InputStream in, OutputStream out) {
+        setInputStream(in);
+        setOutputStream(out);
+    }
+
+    /** */
+    public final void setInputStream(InputStream in) {
         if (in instanceof DataInputStream)
             inStream = (DataInputStream) in;
         else
             inStream = new DataInputStream(in);
+    }
+
+    /** */
+    public final void setOutputStream(OutputStream out) {
         if (out instanceof PrintStream)
             outStream = (PrintStream) out;
         else
@@ -83,14 +99,14 @@ public class CommandInterpreter {
         case CMD_RESUME:
             try {
                 pgm.resume(inStream, outStream);
-            } catch (BASICRuntimeError e) {
+            } catch (BasicRuntimeError e) {
                 outStream.println(e.getMsg());
             }
             return pgm;
         case CMD_CONT:
             try {
                 pgm.cont(inStream, outStream);
-            } catch (BASICRuntimeError e) {
+            } catch (BasicRuntimeError e) {
                 outStream.println(e.getMsg());
             }
             return pgm;
@@ -98,7 +114,7 @@ public class CommandInterpreter {
         case CMD_RUN:
             try {
                 pgm.run(inStream, outStream);
-            } catch (BASICRuntimeError e2) {
+            } catch (BasicRuntimeError e2) {
                 outStream.println(e2.getMsg());
             }
             return pgm;
@@ -113,13 +129,17 @@ public class CommandInterpreter {
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(t.stringValue());
-            } catch (IOException except) { return pgm; }
+            } catch (IOException except) {
+                return pgm;
+            }
             PrintStream pp = new PrintStream(fos);
             pgm.list(pp);
             pp.flush();
             try {
                 fos.close();
-            } catch (IOException except) { return pgm; }
+            } catch (IOException except) {
+                return pgm;
+            }
             return pgm;
 
         case CMD_LOAD:
@@ -131,9 +151,9 @@ public class CommandInterpreter {
                 pgm = Program.load(t.stringValue(), outStream);
                 outStream.println("File loaded.");
             } catch (IOException e) {
-                outStream.println("File "+t.stringValue()+" not found.");
+                outStream.println("File " + t.stringValue() + " not found.");
                 return pgm;
-            } catch (BASICSyntaxError bse) {
+            } catch (BasicSyntaxError bse) {
                 outStream.println("Syntax error reading file.");
                 outStream.println(bse.getMsg());
                 return pgm;
@@ -144,8 +164,9 @@ public class CommandInterpreter {
             t = lt.nextToken();
             if (t.typeNum() == Token.STRING) {
                 try {
-                    zzz = new PrintStream(new FileOutputStream(t.stringValue()));
-                } catch (IOException ii) { }
+                    zzz = new PrintStream(Files.newOutputStream(Paths.get(t.stringValue())));
+                } catch (IOException ii) {
+                }
             }
             pgm.dump(zzz);
             if (zzz != outStream)
@@ -184,7 +205,7 @@ public class CommandInterpreter {
         return pgm;
     }
 
-    char data[] = new char[256];
+    char[] data = new char[256];
 
     public Object start() {
         return start(false);
@@ -205,10 +226,10 @@ public class CommandInterpreter {
         outStream.println("Copyright (C) 1996 Chuck McManis. All Rights Reserved.");
 
         while (true) {
-            Statement s = null;
+            Statement s;
             try {
                 lineData = dis.readLine();
-Debug.println(Level.FINER, "line: " + lineData);
+                Debug.println(Level.FINER, "line: " + lineData);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 outStream.println("Caught an IO exception reading the input stream!");
@@ -217,11 +238,11 @@ Debug.println(Level.FINER, "line: " + lineData);
 
             // exit on eof of the input stream
             if (lineData == null) {
-Debug.println(Level.FINER, "eol");
+                Debug.println(Level.FINER, "eol");
                 if (exec) {
                     try {
                         pgm.run(inStream, outStream);
-                    } catch (BASICRuntimeError e2) {
+                    } catch (BasicRuntimeError e2) {
                         outStream.println(e2.getMsg());
                     }
                 }
@@ -234,7 +255,7 @@ Debug.println(Level.FINER, "eol");
 
             lt.reset(lineData);
 
-            if (! lt.hasMoreTokens())
+            if (!lt.hasMoreTokens())
                 continue;
 
             Token t = lt.nextToken();
@@ -242,7 +263,7 @@ Debug.println(Level.FINER, "eol");
             /*
              * Process one of the command interpreter's commands.
              */
-            case Token.COMMAND :
+            case Token.COMMAND:
                 if (t.numValue() == CMD_BYE)
                     return pgm;
                 else if (t.numValue() == CMD_NEW) {
@@ -259,7 +280,7 @@ Debug.println(Level.FINER, "eol");
              * Process an initial number, it can be a new statement line
              * or it may be an implicit delete command.
              */
-            case Token.CONSTANT :
+            case Token.CONSTANT:
                 Token peek = lt.nextToken();
                 if (peek.typeNum() == Token.EOL) {
                     pgm.del((int) t.numValue());
@@ -272,8 +293,8 @@ Debug.println(Level.FINER, "eol");
                     s.addText(lineData);
                     s.addLine((int) t.numValue());
                     pgm.add((int) t.numValue(), s);
-                } catch (BASICSyntaxError e) {
-                    outStream.println("Syntax Error : "+e.getMsg());
+                } catch (BasicSyntaxError e) {
+                    outStream.println("Syntax Error : " + e.getMsg());
                     outStream.println(lt.showError());
                     continue;
                 }
@@ -283,9 +304,9 @@ Debug.println(Level.FINER, "eol");
              * If initially it is a variable or a statement keyword then it
              * must be an 'immediate' line.
              */
-            case Token.VARIABLE :
-            case Token.KEYWORD : // immediate mode
-            case Token.SYMBOL :
+            case Token.VARIABLE:
+            case Token.KEYWORD: // immediate mode
+            case Token.SYMBOL:
                 lt.unGetToken();
                 try {
                     s = ParseStatement.statement(lt);
@@ -293,11 +314,11 @@ Debug.println(Level.FINER, "eol");
                         s = s.execute(pgm, inStream, outStream);
                     } while (s != null);
 
-                } catch (BASICSyntaxError e) {
-                    outStream.println("Syntax Error : "+e.getMsg());
+                } catch (BasicSyntaxError e) {
+                    outStream.println("Syntax Error : " + e.getMsg());
                     outStream.println(lt.showError());
                     continue;
-                } catch (BASICRuntimeError er) {
+                } catch (BasicRuntimeError er) {
                     outStream.println("RUNTIME ERROR.");
                     outStream.println(er.getMsg());
                 }
