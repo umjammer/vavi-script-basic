@@ -10,7 +10,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import vavi.util.Debug;
+
 
 /**
  * JasicTest.
@@ -42,6 +48,22 @@ class JasicTest {
         String contents = new String(Files.readAllBytes(p));
         Jasic jasic = new Jasic();
         jasic.interpret(contents);
+    }
+
+    @Disabled("wip")
+    @Test
+    void testJsr223() throws Exception {
+        ScriptEngineManager sem = new ScriptEngineManager();
+        ScriptEngine engine = sem.getEngineByName("jasic");
+        Debug.println("engine: " + engine);
+
+        String statement = "test = 100";
+        Object result = engine.eval(statement);
+Debug.println("result: " + result);
+
+        statement = "print test + 100";
+        result = engine.eval(statement);
+Debug.println("result: " + result);
     }
 }
 
