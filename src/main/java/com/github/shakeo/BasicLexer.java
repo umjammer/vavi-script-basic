@@ -1,26 +1,6 @@
 package com.github.shakeo;
 
-import vavi.util.Debug;
-
 public class BasicLexer {
-
-    /**
-     * test driver
-     */
-    public static void main(String[] args) {
-        BasicLexer b = new BasicLexer("PRINT \"AA A\"/140433+B");
-        int s;
-        while((s = b.getToken()) != BasicLexer.END){
-            Debug.println(s);
-            Debug.println("Token = " + String.valueOf(
-                s == BasicLexer.NAME ? b.getStringValue() :
-                s == BasicLexer.STRING ? b.getStringValue() :
-                s == BasicLexer.NUMBER ? b.numberIsReal() ? b.getRealValue() : b.getIntegerValue() : 
-                s == BasicLexer.OPERATOR ? b.getStringValue() :
-                s == BasicLexer.END ? "" : ""
-            ));
-        }
-    }
 
     public static final int NAME = 0, NUMBER = 1, STRING = 2, OPERATOR = 3, COMMA = 4, END = -1;
 
