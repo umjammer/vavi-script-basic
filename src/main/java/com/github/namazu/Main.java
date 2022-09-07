@@ -25,7 +25,7 @@ public class Main {
         Node program;
 
         // File Exist Check
-        if (new File(SORCE_PATH).exists() == false) {
+        if (!new File(SORCE_PATH).exists()) {
             System.err.println("ソースファイルがないよ？");
                 return;
             }
@@ -39,7 +39,7 @@ Debug.println("lex: " + lex);
             program = ProgramNode.isMatch(env, first);
 Debug.println("program: " + program);
         boolean res = program.parse();
-        if (res == false) {
+        if (!res) {
             System.err.println("Syntax error");
             return;
         }

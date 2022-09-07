@@ -15,7 +15,7 @@ import java.util.*;
  * organized in phases, with each appearing roughly in the order that they
  * occur when a program is run. You should be able to read this top-down to walk
  * through the entire process of loading and running a program.
- *
+ * <pre>
  * Jasic language syntax
  * ---------------------
  *
@@ -85,6 +85,7 @@ import java.util.*;
  * <name>
  *     A name in an expression simply returns the value of the variable with
  *     that name. If the variable was never set, it defaults to 0.
+ * </pre>
  *
  * All binary operators have the same precedence. Sorry, I had to cut corners
  * somewhere.
@@ -130,7 +131,7 @@ public class Jasic {
     private static List<Token> tokenize(String source) {
         List<Token> tokens = new ArrayList<>();
 
-        String token = "";
+        StringBuilder token = new StringBuilder();
         TokenizeState state = TokenizeState.DEFAULT;
 
         // Many tokens are a single character, like operators and ().
@@ -151,10 +152,10 @@ public class Jasic {
                     tokens.add(new Token(Character.toString(c),
                         tokenTypes[charTokens.indexOf(c)]));
                 } else if (Character.isLetter(c)) {
-                    token += c;
+                    token.append(c);
                     state = TokenizeState.WORD;
                 } else if (Character.isDigit(c)) {
-                    token += c;
+                    token.append(c);
                     state = TokenizeState.NUMBER;
                 } else if (c == '"') {
                     state = TokenizeState.STRING;
@@ -165,14 +166,14 @@ public class Jasic {
 
             case WORD:
                 if (Character.isLetterOrDigit(c)) {
-                    token += c;
+                    token.append(c);
                 } else if (c == ':') {
-                    tokens.add(new Token(token, TokenType.LABEL));
-                    token = "";
+                    tokens.add(new Token(token.toString(), TokenType.LABEL));
+                    token = new StringBuilder();
                     state = TokenizeState.DEFAULT;
                 } else {
-                    tokens.add(new Token(token, TokenType.WORD));
-                    token = "";
+                    tokens.add(new Token(token.toString(), TokenType.WORD));
+                    token = new StringBuilder();
                     state = TokenizeState.DEFAULT;
                     i--; // Reprocess this character in the default state.
                 }
@@ -183,10 +184,10 @@ public class Jasic {
                 // To get a negative number, just do 0 - <your number>.
                 // To get a floating point, divide.
                 if (Character.isDigit(c)) {
-                    token += c;
+                    token.append(c);
                 } else {
-                    tokens.add(new Token(token, TokenType.NUMBER));
-                    token = "";
+                    tokens.add(new Token(token.toString(), TokenType.NUMBER));
+                    token = new StringBuilder();
                     state = TokenizeState.DEFAULT;
                     i--; // Reprocess this character in the default state.
                 }
@@ -194,11 +195,11 @@ public class Jasic {
 
             case STRING:
                 if (c == '"') {
-                    tokens.add(new Token(token, TokenType.STRING));
-                    token = "";
+                    tokens.add(new Token(token.toString(), TokenType.STRING));
+                    token = new StringBuilder();
                     state = TokenizeState.DEFAULT;
                 } else {
-                    token += c;
+                    token.append(c);
                 }
                 break;
 
@@ -542,7 +543,7 @@ public class Jasic {
      * A "print" statement evaluates an expression, converts the result to a
      * string, and displays it to the user.
      */
-    public class PrintStatement implements Statement {
+    public static class PrintStatement implements Statement {
         public PrintStatement(Expression expression) {
             this.expression = expression;
         }
@@ -610,7 +611,7 @@ public class Jasic {
 
         public void execute() {
             if (labels.containsKey(label)) {
-                currentStatement = labels.get(label).intValue();
+                currentStatement = labels.get(label);
             }
         }
 
@@ -631,7 +632,7 @@ public class Jasic {
             if (labels.containsKey(label)) {
                 double value = condition.evaluate().toNumber();
                 if (value != 0) {
-                    currentStatement = labels.get(label).intValue();
+                    currentStatement = labels.get(label);
                 }
             }
         }
@@ -680,17 +681,17 @@ public class Jasic {
                 // Coerce to the left argument's type, then compare.
                 if (leftVal instanceof NumberValue) {
                     return new NumberValue((leftVal.toNumber() ==
-                                            rightVal.toNumber()) ? 1 : 0);
+                            rightVal.toNumber()) ? 1 : 0);
                 } else {
                     return new NumberValue(leftVal.toString().equals(
-                                           rightVal.toString()) ? 1 : 0);
+                            rightVal.toString()) ? 1 : 0);
                 }
             case '+':
                 // Addition if the left argument is a number, otherwise do
                 // string concatenation.
                 if (leftVal instanceof NumberValue) {
                     return new NumberValue(leftVal.toNumber() +
-                                           rightVal.toNumber());
+                            rightVal.toNumber());
                 } else {
                     return new StringValue(leftVal.toString() +
                             rightVal.toString());
@@ -708,16 +709,16 @@ public class Jasic {
                 // Coerce to the left argument's type, then compare.
                 if (leftVal instanceof NumberValue) {
                     return new NumberValue((leftVal.toNumber() <
-                                            rightVal.toNumber()) ? 1 : 0);
+                            rightVal.toNumber()) ? 1 : 0);
                 } else {
                     return new NumberValue((leftVal.toString().compareTo(
-                                           rightVal.toString()) < 0) ? 1 : 0);
+                            rightVal.toString()) < 0) ? 1 : 0);
                 }
             case '>':
                 // Coerce to the left argument's type, then compare.
                 if (leftVal instanceof NumberValue) {
                     return new NumberValue((leftVal.toNumber() >
-                                            rightVal.toNumber()) ? 1 : 0);
+                            rightVal.toNumber()) ? 1 : 0);
                 } else {
                     return new NumberValue((leftVal.toString().compareTo(
                             rightVal.toString()) > 0) ? 1 : 0);
@@ -765,7 +766,7 @@ public class Jasic {
     /**
      * A numeric value. Jasic uses doubles internally for all numbers.
      */
-    public class NumberValue implements Value {
+    public static class NumberValue implements Value {
         public NumberValue(double value) {
             this.value = value;
         }
@@ -780,7 +781,7 @@ public class Jasic {
     /**
      * A string value.
      */
-    public class StringValue implements Value {
+    public static class StringValue implements Value {
         public StringValue(String value) {
             this.value = value;
         }

@@ -161,9 +161,10 @@ public abstract class Statement {
      * execution such as divide by zero etc.
      */
     protected abstract Statement doit(Program pgm, InputStream in, PrintStream out)
-    throws BasicRuntimeError;
+            throws BasicRuntimeError;
 
     protected RedBlackTree<VariableExpression> vars; // variables used by this statement.
+
     /**
      * The trace method can be used during execution to print out what
      * the program is doing.
@@ -195,7 +196,7 @@ public abstract class Statement {
                 } catch (BasicRuntimeError bse) {
                     t = "Not yet defined.";
                 }
-                ps.println("        :"+vi.unparse()+" = "+(vi.isString() ? "\""+t+"\"" : t));
+                ps.println("        :" + vi.unparse() + " = " + (vi.isString() ? "\"" + t + "\"" : t));
             }
         }
     }

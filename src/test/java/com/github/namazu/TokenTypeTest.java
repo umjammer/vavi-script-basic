@@ -62,7 +62,6 @@ class TokenTypeTest {
         tokenPatternTest("=<", testTokenType, true);
         tokenPatternTest("<>", testTokenType, true);
         tokenPatternTest("><", testTokenType, false);
-
     }
 
     private static void tokenPatternTest(String test, TokenType type, boolean expect) throws Exception {

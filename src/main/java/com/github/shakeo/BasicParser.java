@@ -2,6 +2,8 @@
 package com.github.shakeo;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.logging.Level;
 
 import vavi.util.Debug;
@@ -9,7 +11,7 @@ import vavi.util.Debug;
 
 public class BasicParser {
 
-    interface View {
+    public interface View {
         void print(String s);
     }
 
@@ -19,20 +21,20 @@ public class BasicParser {
     int token;
     int linenum;
 
-    private Command[] allCommands = {
-        new PrintCommand()
-    };
+    List<Command> allCommands = new ArrayList<>();
 
-    private Func[] allFuncs = {
-        new SinFunc()
-    };
+    List<Func> allFuncs = new ArrayList<>();
 
     BasicParser(View wp) {
         w = wp;
-        for (Command c : allCommands)
-            c.add(w, mem);
-        for (Func f : allFuncs)
-            f.add(w, mem);
+        for (Command c : ServiceLoader.load(Command.class)) {
+            c.init(w, mem);
+            allCommands.add(c);
+        }
+        for (Func f : ServiceLoader.load(Func.class)) {
+            f.init(w, mem);
+            allFuncs.add(f);
+        }
     }
 
     public void exec(String line_str, BasicMemory mem, int linenum) {
@@ -114,7 +116,7 @@ Debug.println("openum " + c.operand_num);
                         if (token != BasicLexer.COMMA)
                             break;
                     }
-                    operands = (Variable[]) operand_list.toArray(new Variable[operand_list.size()]);
+                    operands = operand_list.toArray(new Variable[0]);
                 }
                 returncode = c.exec(operands);
                 break;

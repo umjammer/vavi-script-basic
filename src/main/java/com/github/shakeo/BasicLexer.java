@@ -38,7 +38,7 @@ public class BasicLexer {
     }
 
     public int getToken(){
-        String buf = "";
+        StringBuilder buf = new StringBuilder();
         int mode = 0;
         boolean escape = false;
         isreal = false;
@@ -49,13 +49,13 @@ public class BasicLexer {
 
         while(c == ' ') c = str.toCharArray()[++ptr];
 
-        mode  = isAlpha(c)          ? 1 : //name mode
-                isNumeric(c)        ? 2 : //num mode
-                isOperatorSymbol(c) ? 3 : //symbol mode
-                c == '"'            ? 4 : //riteral mode
-                -1;                       //?????
+        mode  = isAlpha(c)          ? 1 : // name mode
+                isNumeric(c)        ? 2 : // num mode
+                isOperatorSymbol(c) ? 3 : // symbol mode
+                c == '"'            ? 4 : // riteral mode
+                -1;                       // ?????
 
-        if(mode != 4) buf += String.valueOf(c);
+        if(mode != 4) buf.append(c);
         ptr++;
 
         if(c == ',') return COMMA;
@@ -67,29 +67,29 @@ public class BasicLexer {
             switch(mode){
             case 1:
                 if(!isAlpha(c) && !isNumeric(c) && c != '_'){
-                    string_val = buf;
+                    string_val = buf.toString();
                     return NAME;
                 }
-                buf += String.valueOf(c);
+                buf.append(c);
                 break;
             case 2:
                 if(!isNumeric(c) && c != '.'){
                     if(isreal){
-                        real_val = Double.valueOf(buf);
+                        real_val = Double.parseDouble(buf.toString());
                     }else{
-                        int_val = Integer.valueOf(buf);
+                        int_val = Integer.parseInt(buf.toString());
                     }
                     return NUMBER;
                 }
                 if(c == '.') isreal = true;
-                buf += String.valueOf(c);
+                buf.append(c);
                 break;
             case 3:
                 if(!isOperator(buf + String.valueOf(c))){
-                    string_val = buf;
+                    string_val = buf.toString();
                     return OPERATOR;
                 }
-                buf += String.valueOf(c);
+                buf.append(c);
                 break;
             case 4:
                 if(!escape){
@@ -97,10 +97,10 @@ public class BasicLexer {
                         escape = true;
                     }else if(c == '"'){
                         ptr++;
-                        string_val = buf;
+                        string_val = buf.toString();
                         return STRING;
                     }
-                    buf += String.valueOf(c);
+                    buf.append(c);
                 }else{
                     escape = false;
                 }
