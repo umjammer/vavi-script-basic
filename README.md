@@ -1,5 +1,6 @@
 [![Release](https://jitpack.io/v/umjammer/vavi-script-basic.svg)](https://jitpack.io/#umjammer/vavi-script-basic)
 [![Actions Status](https://github.com/umjammer/vavi-script-basic/workflows/Java%20CI/badge.svg)](https://github.com/umjammer/vavi-script-basic/actions)
+[![CodeQL](https://github.com/umjammer/vavi-script-basic/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/vavi-script-basic/actions/workflows/codeql-analysis.yml)
 ![Java](https://img.shields.io/badge/Java-8-b07219)
 
 # vavi-script-basic

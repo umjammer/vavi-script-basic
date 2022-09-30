@@ -8,16 +8,68 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.10.1</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>1.0-alpha-11</version>
+        <extensions>true</extensions>
+        <configuration>
+          <javahOS>darwin</javahOS>
+          <compilerProvider>generic-classic</compilerProvider>
+          <compilerStartOptions>
+            <compilerStartOption>-g -Wall -O2 -fomit-frame-pointer -fPIC</compilerStartOption>
+            <!-- unless locating jdk includes, cause error why??? -->
+            <compilerStartOption>-arch x86_64
+              -I${java.home}/../include
+              -I${java.home}/../include/darwin
+              -I.
+            </compilerStartOption>
+          </compilerStartOptions>
+          <sources>
+            <source>
+              <directory>src/test/native</directory>
+              <fileNames>
+                <fileName>test.m</fileName>
+              </fileNames>
+            </source>
+          </sources>
+          <linkerStartOptions>
+            <linkerStartOption>-arch x86_64
+              -lobjc -framework Foundation -framework JavaNativeFoundation
+              -ljvm -L${java.home}/../jre/lib/server
+            </linkerStartOption>
+          </linkerStartOptions>
+          <linkerFinalName/>
+          <linkerEndOptions>
+            <linkerEndOption>-o ${project.build.directory}/jvmtest</linkerEndOption>
+          </linkerEndOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>compile-pvorbis</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+              <goal>link</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
+        <version>3.0.0-M7</version>
         <configuration>
           <argLine>
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
@@ -40,7 +92,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.8.1</version>
+        <version>5.8.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
