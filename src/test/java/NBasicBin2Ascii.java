@@ -11,8 +11,13 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-
-public class NBasicBin2Text2 {
+/**
+ * N-Basic.
+ *
+ * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
+ * @version 0.00 2022/03/03 nsano initial version <br>
+ */
+public class NBasicBin2Ascii {
 
     static final String[] keywordsBase = {
             "END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ", "LET", "GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM",
@@ -56,7 +61,7 @@ public class NBasicBin2Text2 {
 
     public static void main(String[] args) throws IOException {
 
-        NBasicBin2Text2 app = new NBasicBin2Text2();
+        NBasicBin2Ascii app = new NBasicBin2Ascii();
 
         String srcFileName = null;
         String dstFileName = null;
