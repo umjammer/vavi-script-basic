@@ -16,27 +16,31 @@ import vavi.util.Debug;
 
 
 /**
- * N88-BASIC 中間コードファイルをアスキーに変換
+ * convert N88-BASIC(86) middle code file to ascii file.
  * <p>
  * TODO space between keyword and keyword
  *
  * @author @kishi24
  * @version 2022/06/10 ver.1.6.1
  */
-public class Test1 {
+public class N88BasicBin2Ascii {
 
+    /** */
     static int offset = 0;
 
+    /** */
     static final Properties data = new Properties();
 
     static {
         try {
             // TODO we need to change table for n80, n88, n88(86)
-            data.load(Test1.class.getResourceAsStream("/n98.properties"));
+            data.load(N88BasicBin2Ascii.class.getResourceAsStream("/n98.properties"));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
+
+    /** */
     static String read_4byte(LittleEndianDataInputStream file) throws IOException {
         int one = file.readUnsignedByte();
         int two = file.readUnsignedByte();
@@ -47,11 +51,11 @@ public class Test1 {
             return "0";
         }
 
-        // 仮数部の処理
+        // process mantissa
         String kasu = String.format("%02x%02x%02x", three, two, one);
         String frac = Integer.toBinaryString(Integer.parseInt(kasu, 16));
 
-        // to_s(2) による桁落ちを補正
+        // adjust precision loss by to_s(2)
         if (24 > frac.length()) {
             int m = 24 - frac.length();
             for (int i = 0; i < m; i++) {
@@ -68,7 +72,7 @@ public class Test1 {
             frac = '1' + frac.substring(1);
         }
 
-        // 0b から実数へ変換
+        // convert to real number from 0b
         double num = 0.0;
         for (int i = 0; i <= 22; i++) {
             if ('1' == frac.charAt(i)) {
@@ -77,7 +81,7 @@ public class Test1 {
         }
         num = num * Math.pow(2, e);
 
-        // 有効桁 7 におさめて行末の 0 を削除
+        // round significant 7 digits and trim trailer 0
         String[] data2 = String.valueOf(num).split("\\.");
         if (data2[1].matches("^0+$")) {
             return (sign ? "-" : "") + data2[0] + "!";
@@ -99,6 +103,7 @@ public class Test1 {
         return num2;
     }
 
+    /** */
     static String read_8byte(LittleEndianDataInputStream file) throws IOException {
         int one = file.readUnsignedByte();
         int two = file.readUnsignedByte();
@@ -154,6 +159,9 @@ public class Test1 {
         return num2;
     }
 
+    /**
+     * @param args 0: basic file
+     */
     public static void main(String[] args) throws IOException {
 
         String file = args[0];

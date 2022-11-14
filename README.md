@@ -37,6 +37,7 @@ basic language collection as jsr223
  * https://github.com/mayuropensource/PuffinBASIC
  * https://github.com/EgonOlsen71/basicv2
  * https://github.com/namazu510/basic-interpreter
+ * http://www.kiwi-us.com/~ohta/pc88/kanji/
 
 ## TODO
 
